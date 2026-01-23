@@ -181,28 +181,6 @@
 
 <script>
 let ALL = [];
-  <script>
-function makeKey(q){
-  // chave "única" (categoria + nível + texto)
-  return `${(q.lang||"").trim()}|${(q.diff||"").trim()}|${(q.q||"").trim().toLowerCase()}`;
-}
-
-function dedupeQuestions(list){
-  const seen = new Set();
-  const out = [];
-  for(const q of list){
-    const key = makeKey(q);
-    if(seen.has(key)) continue;     // remove duplicadas
-    seen.add(key);
-    out.push(q);
-  }
-  console.log("Perguntas:", list.length, "→ sem duplicadas:", out.length);
-  return out;
-}
-
-// ... depois que você carregar ALL do JSON, faça:
-ALL = dedupeQuestions(ALL);
-</script>
 let order = [];
 let idx = 0;
 let score = 0;
