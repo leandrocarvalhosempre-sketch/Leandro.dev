@@ -53,6 +53,7 @@ img {
 }
 .center{
     text-align: center;
+<<<<<<< HEAD
 }
 /* ===== PROJETOS ===== */
 
@@ -196,3 +197,6 @@ header a {
 header a:hover {
     color: #1cee6c;
 }
+=======
+}
+>>>>>>> c3efc6547f49e60fae0e7a3f461f4a5289ebde85
