@@ -178,151 +178,21 @@
     </div>
 
   </div>
-  // aqui temos 150 por categoria (50 por nível), então sempre deve ter 50 no treino
-  return filtered.length?filtered:ALL;
-}
-
-function resetHelps(){ help5050=1; helpHint=2; helpSkip=1; }
-
-function newGame(){
-  const set = buildQuestionSet();
-  window.__set = set;
-  order = shuffle([...Array(set.length).keys()]);
-  idx=0; score=0; streak=0; resetHelps();
-  game.style.display="block"; end.style.display="none";
-  elTotal.textContent=set.length;
-  updateStatusChips(); updateTopUI(); render();
-}
-
-function showFeedback(ok,title,explain){
-  elFeedback.style.display="block";
-  elFbTitle.textContent=title;
-  elExplain.textContent=explain;
-  elDot.style.background = ok ? "var(--good)" : "var(--bad)";
-}
-
-function render(){
-  btnNext.disabled=true;
-  elFeedback.style.display="none";
-  elAnswers.innerHTML="";
-  used5050=false; usedHint=false;
-
-  if(idx>=order.length){ finishGame(); return; }
-
-  const q = window.__set[order[idx]];
-  shuffleAnswers(q); // ✅ deixa a correta aleatória
-
-  elIdx.textContent = (idx+1);
-  elBar.style.width = (idx/order.length*100)+"%";
-  elBadgeLang.textContent = "📚 " + q.lang;
-  elBadgeDiff.textContent = "🎚️ " + q.diff;
-  elQ.textContent = q.q;
-  elDesc.textContent = q.d || "";
-
-  q.a.forEach((txt,iChoice)=>{
-    const b=document.createElement("button");
-    b.className="answer";
-    b.dataset.choice=String(iChoice);
-    b.textContent=String.fromCharCode(65+iChoice)+". "+txt;
-    b.onclick=()=>pick(iChoice);
-    elAnswers.appendChild(b);
-  });
-}
-
-function pick(choice){
-  const q=window.__set[order[idx]];
-  [...document.querySelectorAll("button.answer")].forEach(b=>b.disabled=true);
-  const correct = (choice===q.c);
-  if(correct){
-    score += 10; streak += 1;
-    if(streak>best){ best=streak; localStorage.setItem("best_streak", String(best)); }
-    showFeedback(true,"Acertou! ✅", q.e || "Boa!");
-  } else {
-    score = Math.max(0, score-2);
-    streak = 0;
-    showFeedback(false,"Quase! ❌", `Certa: ${String.fromCharCode(65+q.c)}. ${q.a[q.c]} — ${q.e || ""}`);
-  }
-  updateTopUI();
-  btnNext.disabled=false;
-  elBar.style.width = ((idx+1)/order.length*100)+"%";
-}
-
-function next(){ idx += 1; render(); }
-
-function disableWrongTwo(){
-  const q=window.__set[order[idx]];
-  const wrong=[];
-  for(let k=0;k<q.a.length;k++) if(k!==q.c) wrong.push(k);
-  const toHide = shuffle(wrong).slice(0,2);
-  [...document.querySelectorAll("button.answer")].forEach(b=>{
-    const ch=Number(b.dataset.choice);
-    if(toHide.includes(ch)) b.style.display="none";
-  });
-}
-
-function use5050(){
-  if(help5050<=0 || used5050) return;
-  help5050-=1; used5050=true;
-  disableWrongTwo(); updateTopUI();
-  showFeedback(true,"🃏 50/50 usado!","Removi 2 alternativas erradas 😉");
-}
-function useHint(){
-  if(helpHint<=0 || usedHint) return;
-  helpHint-=1; usedHint=true;
-  const q=window.__set[order[idx]];
-  showFeedback(true,"💡 Dica!", q.hint || "Elimine as opções absurdas e foque no conceito principal.");
-  updateTopUI();
-}
-function useSkipNoStreakLoss(){
-  if(helpSkip<=0) return;
-  helpSkip-=1; updateTopUI();
-  showFeedback(true,"⏭️ Pulou sem perder streak!","Você pulou esta pergunta sem resetar sua sequência.");
-  btnNext.disabled=false;
-  [...document.querySelectorAll("button.answer")].forEach(b=>b.disabled=true);
-}
-
-function finishGame(){
-  game.style.display="none";
-  end.style.display="block";
-  finalScore.textContent=score;
-  finalBest.textContent=best;
-
-  const {mode,diff,cat}=currentSettings();
-  const name = prompt("Seu nome para o ranking (Top 10):", "Leandro") || "Jogador";
-  const meta = mode==="train" ? `Nível ${diff} • ${cat}` : `Nível ${diff}`;
-  const entry = { name: name.slice(0,20), score, mode: (mode==="train"?"Treino":"Normal"), meta, ts: Date.now() };
-
-  const list=loadRank();
-  list.push(entry);
-  list.sort((a,b)=> b.score-a.score || b.ts-a.ts);
-  saveRank(list.slice(0,10));
-  renderRank();
-}
-
-btnNext.addEventListener("click", next);
-btnRestart.addEventListener("click", newGame);
-btn5050.addEventListener("click", use5050);
-btnHint.addEventListener("click", useHint);
-btnSkip.addEventListener("click", useSkipNoStreakLoss);
-btnApply.addEventListener("click", newGame);
-btnClearRank.addEventListener("click", ()=>{ if(confirm("Limpar ranking local?")){ localStorage.removeItem(LS_RANK); renderRank(); } });
-playAgain.addEventListener("click", newGame);
-
-async function init(){
-  elBest.textContent=best;
-  renderRank(); updateStatusChips();
-  try{
-    const res = await fetch("./questions.json");
-    ALL = await res.json();
-    newGame();
-  } catch(e){
-    elQ.textContent = "Erro ao carregar questions.json";
-    elDesc.textContent = "Abra com Live Server no VS Code (porta 5500) e garanta que questions.json está na mesma pasta do index.html.";
-    console.error(e);
-  }
-}
+  
 init();
 <script>
+  function buildQuestionSet() {
+  const { mode, diff, cat } = currentSettings();
+
+  let filtered = ALL.filter(q => q.diff === diff);
+
+  if (mode === "train") {
+    filtered = filtered.filter(q => q.lang === cat);
+  }
+
+  // se por algum motivo não houver perguntas filtradas, cai no ALL
+  return filtered.length > 0 ? filtered : ALL;
+  }
 let ALL = [];
 let __set = [];
 let order = [];
