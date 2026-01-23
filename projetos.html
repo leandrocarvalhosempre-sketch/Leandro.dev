@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projetos | Leandro D. de Carvalho</title>
+
+  <!-- seu CSS -->
+  <link rel="stylesheet" href="index.css" />
+
+  <!-- ajustes só para esta página -->
+  <style>
+    /* fundo preto (sobrescreve o fundo branco do index.css) */
+    body{
+      background: radial-gradient(circle, #0a0a0a, #050505) !important;
+      color: #f8f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* estrelas por cima do fundo */
+    #star-container{
+      z-index: 0 !important;   /* <- importante (não use -1 aqui) */
+      pointer-events: none;
+    }
+
+    /* todo o conteúdo fica acima das estrelas */
+    header, .projects{
+      position: relative;
+      z-index: 1;
+    }
+
+    header{
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 50px;
+      font-weight: bold;
+    }
+
+    header a{
+      color:#6a5acd;
+      text-decoration:none;
+    }
+    header a:hover{
+      color:#1cee6c;
+    }
+
+    .projects{
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 0 40px;
+    }
+
+    .project-card{
+      background: rgba(8, 8, 8, 0.9);
+      padding: 30px;
+      border-radius: 18px;
+      border: 2px solid #d4af37;
+      box-shadow: 0 0 25px rgba(212,175,55,0.25);
+      line-height: 1.6;
+    }
+
+    .project-card h2{
+      color:#1cee6c;
+      margin-top:0;
+    }
+
+    .project-card a{
+      display:inline-block;
+      margin-top: 15px;
+      padding: 12px 20px;
+      background:#1cee6c;
+      color:#000;
+      font-weight:bold;
+      border-radius:12px;
+      text-decoration:none;
+      transition: .2s;
+    }
+    .project-card a:hover{
+      background:#ffd700;
+      box-shadow:0 0 15px #ffd700;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- TEM que existir -->
+  <div id="star-container"></div>
+
+  <header>
+    <div><a href="index.html">Sobre mim</a></div>
+    <div><a href="projetos.html">Projetos</a></div>
+    <div><a href="contatos.html">Contatos</a></div>
+  </header>
+
+  <div class="projects">
+    <div class="project-card">
+      <h2>🎮 Quiz Programação PRO</h2>
+
+      <p>
+     criei esse jogo com ia 
+            eu sei trapaciei mais ainda estou em fase de aprendizado kkk
+            experimentem!!!
+            Criei esse jogo como projeto de estudo usando HTML, CSS e JavaScript.
+            Ainda estou em fase de aprendizado, mas quis experimentar e colocar em prática 🚀
+      </p>
+
+      <p>
+        ✅ 900 perguntas<br>
+        ✅ Java, JavaScript, Python, HTML, CSS e Lógica<br>
+        ✅ 3 níveis de dificuldade<br>
+        ✅ Ranking local e cartas de ajuda
+      </p>
+
+      <!-- IMPORTANTE: no seu print a pasta se chama quiz_pro_900 -->
+      <a href="jogoprogramacao/quiz_pro_900/" target="_blank">Acessar Projeto →</a>
+
+    </div>
+  </div>
+
+  <script>
+    function createStars() {
+      const container = document.getElementById('star-container');
+      const starCount = 120;
+
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+
+        const size = (Math.random() * 3 + 1) + 'px';
+        star.style.width = size;
+        star.style.height = size;
+        star.style.top = Math.random() * 100 + 'vh';
+        star.style.left = Math.random() * 100 + 'vw';
+        star.style.animationDelay = Math.random() * 5 + 's';
+
+        container.appendChild(star);
+      }
+    }
+    createStars();
+  </script>
+</body>
+</html>
+
+

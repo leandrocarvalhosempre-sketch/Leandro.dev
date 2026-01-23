@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leandro D. de Carvalho</title>
+    <style>
+        /* CSS - Estilização do Fundo e Layout */
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle, #0a0a0a, #050505);
+            color: #f8f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Menu Superior */
+        header {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 50px;
+            font-weight: bold;
+            color: #6a5acd; /* Cor roxa original do seu menu */
+        }
+
+        /* Container das Estrelas */
+        #star-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #d4af37;
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 8px #ffdf00;
+            animation: blink 3s infinite ease-in-out;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 0.7; transform: scale(1); }
+        }
+
+        /* Foto de Perfil */
+        .profile-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .profile-img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 5px solid #008000; /* Borda verde original */
+            object-fit: cover;
+        }
+
+        /* Conteúdo Principal */
+        .main-content {
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .nome-titulo {
+            color: #1cee6c;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitulo {
+            font-size: 1.2rem;
+            color: #faf8f8;
+            margin-bottom: 30px;
+        }
+
+        /* Card Sobre Mim */
+        .about-card {
+            background: rgba(8, 8, 8, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #d4af37;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            line-height: 1.6;
+        }
+
+        h2 { color: #0af157; margin-top: 0; }
+    </style>
+</head>
+<body>
+
+    <div id="star-container"> <carvalho class="jpg"></carvalho></div>
+
+    <header>
+        <div><a href="index.html">Sobre mim</a></div>
+        <div><a href="projetos.html">Projetos</a></div>
+        <div><a href="contatos.html">Contatos</a></div>
+    </header>
+
+    <div class="profile-container">
+        <img src="leao.jpeg" alt="Leandro D. de Carvalho" class="profile-img">
+    </div>
+
+    <div class="main-content">
+        <h1 class="nome-titulo">Leandro D. de Carvalho</h1>
+        <p class="subtitulo">Iniciante em Programação</p>
+
+        <div class="about-card">
+            <h2>Sobre Mim</h2>
+            <p><strong>Quem é o Leandro?</strong><br>
+            Olá! Sou o Leandro, um entusiasta da tecnologia em transição de carreira para o desenvolvimento de software. Sempre tive curiosidade sobre como as coisas funcionam por trás das telas, e foi essa curiosidade que me trouxe ao mundo da programação.</p>
+            
+            <p><strong>Minha Jornada Atual</strong><br>
+            Atualmente, estou focado em aprender as bases do desenvolvimento web (HTML, CSS e JavaScript). Sou uma pessoa curiosa, disciplinada e busco minha primeira oportunidade para aplicar meus conhecimentos em projetos reais.</p>
+            
+            <p><strong>O que você vai encontrar por aqui:</strong><br>
+            • Foco Técnico: HTML5, CSS3 e JavaScript.<br>
+            • Objetivo: Evoluir constantemente e contribuir com projetos inovadores.</p>
+        </div>
+    <script>
+        function createStars() {
+            const container = document.getElementById('star-container');
+            const starCount = 120;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 4 + 'px';
+                star.style.width = size;
+                star.style.height = size;
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(star);
+            }
+        }
+        createStars();
+    </script>
+</body>
+</html>
