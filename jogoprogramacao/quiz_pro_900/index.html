@@ -178,105 +178,6 @@
     </div>
 
   </div>
-
-<script>
-let ALL = [];
-let order = [];
-let idx = 0;
-let score = 0;
-let streak = 0;
-let best = Number(localStorage.getItem("best_streak") || 0);
-
-let help5050 = 1;
-let helpHint = 2;
-let helpSkip = 1;
-let used5050 = false;
-let usedHint = false;
-
-const LS_RANK = "quiz_rank_top10_900";
-
-const $ = (id)=>document.getElementById(id);
-const elScore = $("score"), elStreak=$("streak"), elBest=$("best");
-const elIdx=$("idx"), elTotal=$("total"), elBar=$("bar");
-const elBadgeLang=$("badgeLang"), elBadgeDiff=$("badgeDiff");
-const elQ=$("question"), elDesc=$("desc"), elAnswers=$("answers");
-const elFeedback=$("feedback"), elDot=$("dot"), elFbTitle=$("fbTitle"), elExplain=$("explain");
-const btnNext=$("next"), btnRestart=$("restart");
-const btn5050=$("help5050"), btnHint=$("helpHint"), btnSkip=$("helpSkip");
-const elH5050=$("h5050"), elHHint=$("hHint"), elHSkip=$("hSkip");
-const modeSel=$("mode"), diffSel=$("difficulty"), catSel=$("category");
-const btnApply=$("apply"), btnClearRank=$("clearRank");
-const sMode=$("sMode"), sDiff=$("sDiff"), sCat=$("sCat");
-const rankBox=$("rank");
-const game=$("game"), end=$("end");
-const finalScore=$("finalScore"), finalBest=$("finalBest"), playAgain=$("playAgain");
-
-function shuffle(arr){
-  const a=[...arr];
-  for(let j=a.length-1;j>0;j--){ const k=Math.floor(Math.random()*(j+1)); [a[j],a[k]]=[a[k],a[j]]; }
-  return a;
-}
-
-function shuffleAnswers(question){
-  const answers = question.a.map((text, index)=>({ text, isCorrect: index===question.c }));
-  for(let i=answers.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [answers[i],answers[j]]=[answers[j],answers[i]]; }
-  question.a = answers.map(x=>x.text);
-  question.c = answers.findIndex(x=>x.isCorrect);
-}
-
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"})[m]);
-}
-
-function loadRank(){
-  try{ const raw = localStorage.getItem(LS_RANK); const p = raw?JSON.parse(raw):[]; return Array.isArray(p)?p:[]; }
-  catch{ return []; }
-}
-function saveRank(list){ localStorage.setItem(LS_RANK, JSON.stringify(list)); }
-function renderRank(){
-  const list = loadRank();
-  rankBox.innerHTML = "";
-  if(list.length===0){
-    const div=document.createElement("div");
-    div.className="rank-item";
-    div.innerHTML="<div class='rank-left'><div class='pos'>—</div><div>Sem ranking ainda</div></div><div>0</div>";
-    rankBox.appendChild(div); return;
-  }
-  list.forEach((r,i)=>{
-    const div=document.createElement("div");
-    div.className="rank-item";
-    div.innerHTML=`
-      <div class="rank-left">
-        <div class="pos">${i+1}</div>
-        <div>
-          <div style="font-weight:950">${escapeHtml(r.name)}</div>
-          <div class="mini" style="margin:2px 0 0">Modo: ${escapeHtml(r.mode)} • ${escapeHtml(r.meta)}</div>
-        </div>
-      </div>
-      <div style="font-weight:980">${r.score}</div>
-    `;
-    rankBox.appendChild(div);
-  });
-}
-
-function updateTopUI(){
-  elScore.textContent=score; elStreak.textContent=streak; elBest.textContent=best;
-  elH5050.textContent=help5050; elHHint.textContent=helpHint; elHSkip.textContent=helpSkip;
-  btn5050.disabled=help5050<=0; btnHint.disabled=helpHint<=0; btnSkip.disabled=helpSkip<=0;
-}
-
-function currentSettings(){ return {mode:modeSel.value, diff:diffSel.value, cat:catSel.value}; }
-function updateStatusChips(){
-  const {mode,diff,cat} = currentSettings();
-  sMode.textContent = mode==="train" ? "Treino" : "Normal";
-  sDiff.textContent = diff;
-  sCat.textContent = mode==="train" ? cat : "—";
-}
-
-function buildQuestionSet(){
-  const {mode,diff,cat} = currentSettings();
-  let filtered = ALL.filter(q=>q.diff===diff);
-  if(mode==="train") filtered = filtered.filter(q=>q.lang===cat);
   // aqui temos 150 por categoria (50 por nível), então sempre deve ter 50 no treino
   return filtered.length?filtered:ALL;
 }
@@ -421,6 +322,350 @@ async function init(){
   }
 }
 init();
+<script>
+let ALL = [];
+let __set = [];
+let order = [];
+let idx = 0;
+
+let score = 0;
+let streak = 0;
+let best = Number(localStorage.getItem("best_streak") || 0);
+
+let help5050 = 1;
+let helpHint = 2;
+let helpSkip = 1;
+
+let used5050 = false;
+let usedHint = false;
+
+let currentCorrectIndex = -1;
+let currentAnswers = [];
+let currentExplain = "";
+
+const LS_RANK = "quiz_rank_top10_900";
+
+const $ = (id)=>document.getElementById(id);
+const elScore = $("score"), elStreak=$("streak"), elBest=$("best");
+const elIdx=$("idx"), elTotal=$("total"), elBar=$("bar");
+const elBadgeLang=$("badgeLang"), elBadgeDiff=$("badgeDiff");
+const elQ=$("question"), elDesc=$("desc"), elAnswers=$("answers");
+const elFeedback=$("feedback"), elDot=$("dot"), elFbTitle=$("fbTitle"), elExplain=$("explain");
+const btnNext=$("next"), btnRestart=$("restart");
+const btn5050=$("help5050"), btnHint=$("helpHint"), btnSkip=$("helpSkip");
+const elH5050=$("h5050"), elHHint=$("hHint"), elHSkip=$("hSkip");
+const modeSel=$("mode"), diffSel=$("difficulty"), catSel=$("category");
+const btnApply=$("apply"), btnClearRank=$("clearRank");
+const sMode=$("sMode"), sDiff=$("sDiff"), sCat=$("sCat");
+const rankBox=$("rank");
+const game=$("game"), end=$("end");
+const finalScore=$("finalScore"), finalBest=$("finalBest"), playAgain=$("playAgain");
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let j=a.length-1;j>0;j--){
+    const k=Math.floor(Math.random()*(j+1));
+    [a[j],a[k]]=[a[k],a[j]];
+  }
+  return a;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  })[m]);
+}
+
+function makeKey(q){
+  return `${(q.lang||"").trim()}|${(q.diff||"").trim()}|${(q.q||"").trim().toLowerCase()}`;
+}
+
+function dedupeQuestions(list){
+  const seen = new Set();
+  const out = [];
+  for(const q of list){
+    const key = makeKey(q);
+    if(seen.has(key)) continue;
+    seen.add(key);
+    out.push(q);
+  }
+  console.log("Perguntas carregadas:", list.length, "→ sem duplicadas:", out.length);
+  return out;
+}
+
+// Embaralha respostas SEM alterar a pergunta original
+function shuffledAnswers(q){
+  const answers = q.a.map((text, i)=>({ text, isCorrect: i === q.c }));
+  for(let i=answers.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [answers[i],answers[j]]=[answers[j],answers[i]];
+  }
+  return {
+    a: answers.map(x=>x.text),
+    c: answers.findIndex(x=>x.isCorrect)
+  };
+}
+
+function loadRank(){
+  try{
+    const raw = localStorage.getItem(LS_RANK);
+    const p = raw?JSON.parse(raw):[];
+    return Array.isArray(p)?p:[];
+  } catch {
+    return [];
+  }
+}
+function saveRank(list){ localStorage.setItem(LS_RANK, JSON.stringify(list)); }
+
+function renderRank(){
+  const list = loadRank();
+  rankBox.innerHTML = "";
+  if(list.length===0){
+    const div=document.createElement("div");
+    div.className="rank-item";
+    div.innerHTML="<div class='rank-left'><div class='pos'>—</div><div>Sem ranking ainda</div></div><div>0</div>";
+    rankBox.appendChild(div);
+    return;
+  }
+  list.forEach((r,i)=>{
+    const div=document.createElement("div");
+    div.className="rank-item";
+    div.innerHTML=`
+      <div class="rank-left">
+        <div class="pos">${i+1}</div>
+        <div>
+          <div style="font-weight:950">${escapeHtml(r.name)}</div>
+          <div class="mini" style="margin:2px 0 0">Modo: ${escapeHtml(r.mode)} • ${escapeHtml(r.meta)}</div>
+        </div>
+      </div>
+      <div style="font-weight:980">${r.score}</div>
+    `;
+    rankBox.appendChild(div);
+  });
+}
+
+function updateTopUI(){
+  elScore.textContent=score;
+  elStreak.textContent=streak;
+  elBest.textContent=best;
+  elH5050.textContent=help5050;
+  elHHint.textContent=helpHint;
+  elHSkip.textContent=helpSkip;
+
+  btn5050.disabled=help5050<=0;
+  btnHint.disabled=helpHint<=0;
+  btnSkip.disabled=helpSkip<=0;
+}
+
+function currentSettings(){ return {mode:modeSel.value, diff:diffSel.value, cat:catSel.value}; }
+
+function updateStatusChips(){
+  const {mode,diff,cat} = currentSettings();
+  sMode.textContent = mode==="train" ? "Treino" : "Normal";
+  sDiff.textContent = diff;
+  sCat.textContent = mode==="train" ? cat : "—";
+}
+
+function buildQuestionSet(){
+  const {mode,diff,cat} = currentSettings();
+  let filtered = ALL.filter(q=>q.diff===diff);
+  if(mode==="train") filtered = filtered.filter(q=>q.lang===cat);
+  return filtered.length ? filtered : ALL;
+}
+
+function resetHelps(){
+  help5050=1;
+  helpHint=2;
+  helpSkip=1;
+}
+
+function showFeedback(ok,title,explain){
+  elFeedback.style.display="block";
+  elFbTitle.textContent=title;
+  elExplain.textContent=explain;
+  elDot.style.background = ok ? "var(--good)" : "var(--bad)";
+}
+
+function newGame(){
+  __set = buildQuestionSet();
+
+  // Ordem sem repetição (índices únicos)
+  order = shuffle([...Array(__set.length).keys()]);
+
+  idx=0;
+  score=0;
+  streak=0;
+  best = Number(localStorage.getItem("best_streak") || 0);
+
+  resetHelps();
+  used5050=false;
+  usedHint=false;
+
+  game.style.display="block";
+  end.style.display="none";
+  elTotal.textContent=__set.length;
+
+  updateStatusChips();
+  updateTopUI();
+  render();
+}
+
+function render(){
+  btnNext.disabled=true;
+  elFeedback.style.display="none";
+  elAnswers.innerHTML="";
+  used5050=false;
+  usedHint=false;
+
+  if(idx >= order.length){
+    finishGame();
+    return;
+  }
+
+  const baseQ = __set[order[idx]];
+  const mixed = shuffledAnswers(baseQ);
+
+  currentCorrectIndex = mixed.c;
+  currentAnswers = mixed.a;
+  currentExplain = baseQ.e || "";
+
+  elIdx.textContent = (idx+1);
+  elBar.style.width = (idx/order.length*100)+"%";
+  elBadgeLang.textContent = "📚 " + baseQ.lang;
+  elBadgeDiff.textContent = "🎚️ " + baseQ.diff;
+  elQ.textContent = baseQ.q;
+  elDesc.textContent = baseQ.d || "";
+
+  mixed.a.forEach((txt,iChoice)=>{
+    const b=document.createElement("button");
+    b.className="answer";
+    b.dataset.choice=String(iChoice);
+    b.textContent=String.fromCharCode(65+iChoice)+". "+txt;
+    b.onclick=()=>pick(iChoice);
+    elAnswers.appendChild(b);
+  });
+}
+
+function pick(choice){
+  [...document.querySelectorAll("button.answer")].forEach(b=>b.disabled=true);
+
+  const correct = (choice === currentCorrectIndex);
+
+  if(correct){
+    score += 10;
+    streak += 1;
+    if(streak>best){
+      best=streak;
+      localStorage.setItem("best_streak", String(best));
+    }
+    showFeedback(true,"Acertou! ✅", currentExplain || "Boa!");
+  } else {
+    score = Math.max(0, score-2);
+    streak = 0;
+    const c = currentCorrectIndex;
+    showFeedback(false,"Quase! ❌", `Certa: ${String.fromCharCode(65+c)}. ${currentAnswers[c]} — ${currentExplain}`);
+  }
+
+  updateTopUI();
+  btnNext.disabled=false;
+  elBar.style.width = ((idx+1)/order.length*100)+"%";
+}
+
+function next(){
+  idx += 1;
+  render();
+}
+
+function disableWrongTwo(){
+  const wrong=[];
+  for(let k=0;k<currentAnswers.length;k++) if(k!==currentCorrectIndex) wrong.push(k);
+  const toHide = shuffle(wrong).slice(0,2);
+
+  [...document.querySelectorAll("button.answer")].forEach(b=>{
+    const ch=Number(b.dataset.choice);
+    if(toHide.includes(ch)) b.style.display="none";
+  });
+}
+
+function use5050(){
+  if(help5050<=0 || used5050) return;
+  help5050-=1;
+  used5050=true;
+  disableWrongTwo();
+  updateTopUI();
+  showFeedback(true,"🃏 50/50 usado!","Removi 2 alternativas erradas 😉");
+}
+
+function useHint(){
+  if(helpHint<=0 || usedHint) return;
+  helpHint-=1;
+  usedHint=true;
+  showFeedback(true,"💡 Dica!","Elimine as opções absurdas e foque no conceito principal.");
+  updateTopUI();
+}
+
+function useSkipNoStreakLoss(){
+  if(helpSkip<=0) return;
+  helpSkip-=1;
+  updateTopUI();
+  showFeedback(true,"⏭️ Pulou sem perder streak!","Você pulou esta pergunta sem resetar sua sequência.");
+  btnNext.disabled=false;
+  [...document.querySelectorAll("button.answer")].forEach(b=>b.disabled=true);
+}
+
+function finishGame(){
+  game.style.display="none";
+  end.style.display="block";
+
+  finalScore.textContent=score;
+  finalBest.textContent=best;
+
+  const {mode,diff,cat} = currentSettings();
+  const name = prompt("Seu nome para o ranking (Top 10):", "Leandro") || "Jogador";
+  const meta = mode==="train" ? `Nível ${diff} • ${cat}` : `Nível ${diff}`;
+
+  const entry = {
+    name: name.slice(0,20),
+    score,
+    mode: (mode==="train"?"Treino":"Normal"),
+    meta,
+    ts: Date.now()
+  };
+
+  const list=loadRank();
+  list.push(entry);
+  list.sort((a,b)=> b.score-a.score || b.ts-a.ts);
+  saveRank(list.slice(0,10));
+  renderRank();
+}
+
+// Eventos
+btnNext.addEventListener("click", next);
+btnRestart.addEventListener("click", newGame);
+btnApply.addEventListener("click", newGame);
+btnClearRank.addEventListener("click", ()=>{ localStorage.removeItem(LS_RANK); renderRank(); });
+btn5050.addEventListener("click", use5050);
+btnHint.addEventListener("click", useHint);
+btnSkip.addEventListener("click", useSkipNoStreakLoss);
+playAgain.addEventListener("click", newGame);
+
+updateTopUI();
+renderRank();
+updateStatusChips();
+
+// Carregar JSON e iniciar
+(async function init(){
+  try{
+    const res = await fetch("./questions.json");
+    if(!res.ok) throw new Error("Não consegui carregar questions.json");
+    const data = await res.json();
+    ALL = dedupeQuestions(Array.isArray(data)?data:[]);
+    if(ALL.length===0) throw new Error("questions.json vazio ou inválido");
+    newGame();
+  } catch (e){
+    console.error(e);
+    elQ.textContent = "Erro ao carregar perguntas.";
+    elDesc.textContent = "Abra com Live Server (não por duplo clique) e confira se questions.json está na mesma pasta.";
+  }
+})();
 </script>
-</body>
-</html>
