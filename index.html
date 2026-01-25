@@ -4,101 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leandro D. de Carvalho</title>
-    <style>
-        /* CSS - Estilização do Fundo e Layout */
-        body {
-            margin: 0;
-            padding: 0;
-            background: radial-gradient(circle, #0a0a0a, #050505);
-            color: #f8f5f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Menu Superior */
-        header {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px 50px;
-            font-weight: bold;
-            color: #6a5acd; /* Cor roxa original do seu menu */
-        }
-
-        /* Container das Estrelas */
-        #star-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        .star {
-            position: absolute;
-            background-color: #d4af37;
-            border-radius: 50%;
-            opacity: 0;
-            box-shadow: 0 0 8px #ffdf00;
-            animation: blink 3s infinite ease-in-out;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0; transform: scale(0.3); }
-            50% { opacity: 0.7; transform: scale(1); }
-        }
-
-        /* Foto de Perfil */
-        .profile-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .profile-img {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 5px solid #008000; /* Borda verde original */
-            object-fit: cover;
-        }
-
-        /* Conteúdo Principal */
-        .main-content {
-            padding: 40px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .nome-titulo {
-            color: #1cee6c;
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-        }
-
-        .subtitulo {
-            font-size: 1.2rem;
-            color: #faf8f8;
-            margin-bottom: 30px;
-        }
-
-        /* Card Sobre Mim */
-        .about-card {
-            background: rgba(8, 8, 8, 0.9);
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #d4af37;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            line-height: 1.6;
-        }
-
-        h2 { color: #0af157; margin-top: 0; }
-    </style>
+    <link rel="stylesheet" href="index.css" />
 </head>
 <body>
 
-    <div id="star-container"> <carvalho class="jpg"></carvalho></div>
+    <div id="star-container"></div>
 
     <header>
         <div><a href="index.html">Sobre mim</a></div>
@@ -126,11 +36,7 @@
             • Foco Técnico: HTML5, CSS3 e JavaScript.<br>
             • Objetivo: Evoluir constantemente e contribuir com projetos inovadores.</p>
         </div>
-<<<<<<< HEAD
-=======
     </div>
-
->>>>>>> c3efc6547f49e60fae0e7a3f461f4a5289ebde85
     <script>
         function createStars() {
             const container = document.getElementById('star-container');
@@ -150,8 +56,4 @@
         createStars();
     </script>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> c3efc6547f49e60fae0e7a3f461f4a5289ebde85

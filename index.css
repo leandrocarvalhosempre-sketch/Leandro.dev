@@ -1,202 +1,206 @@
-   /* Fundo da página com um leve gradiente branco/gelo */
-body {
-    margin: 0;
-    padding: 0;
-    background: radial-gradient(circle, #ffffff, #f0f0f0);
-    overflow-x: hidden;
-    min-height: 100vh;
-    font-family: Arial, sans-serif;
+/* =========================
+   BASE (todas as páginas)
+   ========================= */
+:root{
+  --bg1:#0a0a0a;
+  --bg2:#050505;
+  --text:#f8f5f5;
+  --gold:#ffd700;
+  --gold2:#d4af37;
+  --purple:#6a5acd;
+  --green:#1cee6c;
 }
 
-/* Container das estrelas */
-#star-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Fica atrás de todo o conteúdo */
-    pointer-events: none;
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  padding:0;
+  background: radial-gradient(circle, var(--bg1), var(--bg2));
+  color:var(--text);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
 }
 
-/* Estilo de cada estrela dourada */
-.star {
-    position: absolute;
-    background-color: #ffd700; /* Cor Ouro */
-    border-radius: 50%;
-    opacity: 0;
-    box-shadow: 0 0 5px #ffec8b; /* Brilho da estrela */
-    animation: blink 3s infinite ease-in-out;
+/* Estrelas (fundo) */
+#star-container{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
 }
 
-/* Animação para as estrelas piscarem */
-@keyframes blink {
-    0%, 100% { opacity: 0; transform: scale(0.5); }
-    50% { opacity: 0.8; transform: scale(1.2); }
+.star{
+  position:absolute;
+  background-color: var(--gold2);
+  border-radius:50%;
+  opacity:0;
+  box-shadow: 0 0 8px #ffdf00;
+  animation: blink 3s infinite ease-in-out;
 }
-ul {
-    display: flex;
-    justify-content: space-between;
-    list-style-type: none;
-    align-items: center;
-    padding: 16px;
-}
-a {
-    color: white;
-    text-decoration: none;
-}
-img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    border: 5px solid green;
-}
-.center{
-    text-align: center;
-<<<<<<< HEAD
-}
-/* ===== PROJETOS ===== */
 
+@keyframes blink{
+  0%,100%{ opacity:0; transform:scale(.3); }
+  50%{ opacity:.8; transform:scale(1.15); }
+}
+
+/* Menu */
+header{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  padding:20px 50px;
+  font-weight:700;
+}
+
+header a{
+  color:var(--purple);
+  text-decoration:none;
+}
+
+header a:hover{
+  color:var(--green);
+}
+
+/* Layout utilitário */
+.main-content{
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px 70px;
+}
+
+/* =========================
+   HOME (index.html)
+   ========================= */
+.profile-container{
+  display:flex;
+  justify-content:center;
+  margin-top: 10px;
+}
+
+.profile-img{
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 5px solid #008000;
+  object-fit: cover;
+}
+
+.nome-titulo{
+  color: var(--green);
+  font-size: clamp(28px, 3.2vw, 40px);
+  margin: 18px 0 6px;
+  text-align:center;
+}
+
+.subtitulo{
+  margin: 0 0 24px;
+  text-align:center;
+  color: rgba(248,245,245,.85);
+}
+
+.about-card{
+  background: rgba(8,8,8,.9);
+  border: 2px solid var(--gold2);
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 0 25px rgba(212,175,55,0.18);
+  line-height: 1.65;
+}
+
+.about-card h2{
+  margin-top:0;
+  color: var(--gold);
+}
+
+/* =========================
+   PROJETOS (projetos.html)
+   ========================= */
 .projects{
-  max-width: 800px;
-  margin: 40px auto 60px;
-  padding: 0 40px;
+  max-width: 900px;
+  margin: 20px auto 70px;
+  padding: 0 20px;
 }
 
 .project-card{
   background: rgba(8, 8, 8, 0.9);
-  padding: 25px;
-  border-radius: 15px;
-  border: 2px solid #d4af37;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  padding: 30px;
+  border-radius: 18px;
+  border: 2px solid var(--gold2);
+  box-shadow: 0 0 25px rgba(212,175,55,0.25);
   line-height: 1.6;
 }
 
 .project-card h2{
+  color: var(--green);
   margin-top: 0;
-  color:#0af157;
 }
 
-.project-card p{
-  color:#ffffff;
-}
+.project-card p{ color:#ffffff; }
 
 .project-card a{
   display:inline-block;
-  margin-top: 12px;
-  padding: 10px 16px;
-  background:#1cee6c;
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: var(--green);
   color:#000;
-  font-weight:bold;
-  border-radius:10px;
+  font-weight:800;
+  border-radius: 12px;
   text-decoration:none;
+  transition: transform .15s, box-shadow .15s, background .15s;
 }
 
 .project-card a:hover{
-  background:#ffd700;
-}
-/* ===== FUNDO PRETO COM ESTRELAS ===== */
-
-body {
-    margin: 0;
-    padding: 0;
-    background: radial-gradient(circle, #0a0a0a, #050505);
-    color: #f8f5f5;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
+  background: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px var(--gold);
 }
 
-#star-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    pointer-events: none;
+/* =========================
+   CONTATOS (contatos.html)
+   ========================= */
+.follow-wrap{
+  max-width: 760px;
+  margin: 20px auto 70px;
+  padding: 0 20px;
 }
 
-.star {
-    position: absolute;
-    background-color: #ffd700;
-    border-radius: 50%;
-    opacity: 0;
-    box-shadow: 0 0 8px #ffec8b;
-    animation: blink 3s infinite ease-in-out;
+.follow-card{
+  text-align:center;
+  background: rgba(0,0,0,.60);
+  padding: 34px 26px;
+  border-radius: 20px;
+  border: 2px solid var(--gold2);
+  box-shadow: 0 0 25px rgba(212,175,55,0.18);
 }
 
-@keyframes blink {
-    0%, 100% {
-        opacity: 0;
-        transform: scale(0.4);
-    }
-    50% {
-        opacity: 0.9;
-        transform: scale(1.2);
-    }
+.follow-card h1{
+  margin: 0 0 16px;
+  color: var(--gold);
+  letter-spacing: .6px;
 }
 
-/* ===== PROJETOS ===== */
-
-.projects {
-    max-width: 900px;
-    margin: 60px auto;
-    padding: 0 40px;
+.social-icons{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 18px;
+  align-items:center;
+  justify-items:center;
+  margin-top: 18px;
 }
 
-.project-card {
-    background: rgba(8, 8, 8, 0.9);
-    padding: 30px;
-    border-radius: 18px;
-    border: 2px solid #d4af37;
-    box-shadow: 0 0 25px rgba(212,175,55,0.25);
-    line-height: 1.6;
+.icon{
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: rgba(255,255,255,.06);
+  padding: 10px;
+  transition: transform .15s, box-shadow .15s;
 }
 
-.project-card h2 {
-    color: #1cee6c;
-    margin-top: 0;
+.social-icons a:hover .icon{
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px rgba(255,215,0,.25);
 }
-
-.project-card p {
-    color: #ffffff;
-}
-
-.project-card a {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 12px 20px;
-    background: #1cee6c;
-    color: #000;
-    font-weight: bold;
-    border-radius: 12px;
-    text-decoration: none;
-    transition: all .3s;
-}
-
-.project-card a:hover {
-    background: #ffd700;
-    box-shadow: 0 0 15px #ffd700;
-}
-
-/* ===== MENU ===== */
-
-header {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px 50px;
-    font-weight: bold;
-}
-
-header a {
-    color: #6a5acd;
-    text-decoration: none;
-}
-
-header a:hover {
-    color: #1cee6c;
-}
-=======
-}
->>>>>>> c3efc6547f49e60fae0e7a3f461f4a5289ebde85
