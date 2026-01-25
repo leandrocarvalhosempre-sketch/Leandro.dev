@@ -7,7 +7,7 @@
   --text:#f8f5f5;
   --gold:#ffd700;
   --gold2:#d4af37;
-  --purple:#6a5acd;
+  --purple:#f113f1;
   --green:#1cee6c;
 }
 
@@ -54,9 +54,10 @@ header{
   font-weight:700;
 }
 
-header a{
-  color:var(--purple);
-  text-decoration:none;
+header a {
+  color: #22c55e; /* verde */
+  text-decoration: none;
+  font-weight: 600;
 }
 
 header a:hover{
