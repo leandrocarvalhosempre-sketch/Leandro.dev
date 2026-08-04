@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Códigos | Leandro D. de Carvalho</title>
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+
+  <div id="star-container"></div>
+
+  <header>
+    <div><a href="index.html">Sobre mim</a></div>
+    <div><a href="codigos.html">Códigos</a></div>
+    <div><a href="contatos.html">Contatos</a></div>
+    <div><a href="videos.html">Vídeos</a></div>
+  </header>
+
+  <main class="page-wrap">
+
+    <h1 class="page-title">💻 Códigos</h1>
+    <p class="page-subtitle">
+      Snippets animados que vou encontrando e estudando pela internet — cada um roda de verdade aqui na página,
+      e dá pra ver o código-fonte de cada um.
+    </p>
+
+    <section class="codigos-grid" id="codigos-grid"></section>
+
+  </main>
+
+  <script>
+    /* =========================================================
+       BIBLIOTECA DE CÓDIGOS
+       Para adicionar um novo snippet, copie um bloco { ... }
+       e cole abaixo, dentro do array codeSnippets.
+
+       titulo    -> nome do snippet
+       fonte     -> de onde você tirou (site, autor, etc.) - opcional
+       tags      -> lista de palavras-chave (ex: ["CSS","Loader"])
+       html      -> o HTML que fica DENTRO do preview
+       css       -> o CSS do snippet
+       js        -> o JavaScript do snippet (opcional)
+    ========================================================= */
+    const codeSnippets = [
+      {
+        titulo: "Botão com brilho neon",
+        fonte: "Exemplo próprio",
+        tags: ["CSS", "Botão", "Hover"],
+        html: `<button class="demo-btn">Passe o mouse</button>`,
+        css: `
+.demo-btn{
+  padding: 14px 28px;
+  border-radius: 12px;
+  border: 2px solid #00ff88;
+  background: transparent;
+  color: #00ff88;
+  font-weight: 800;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  letter-spacing: .4px;
+  transition: all .25s ease;
+}
+.demo-btn:hover{
+  background: #00ff88;
+  color: #061109;
+  box-shadow: 0 0 25px rgba(0,255,136,.65);
+  transform: translateY(-2px);
+}`,
+        js: ``
+      },
+      {
+        titulo: "Loader orbital",
+        fonte: "Exemplo próprio",
+        tags: ["CSS", "Loader", "Animação"],
+        html: `<div class="orbit"><div class="orbit-dot"></div><div class="orbit-dot"></div><div class="orbit-dot"></div></div>`,
+        css: `
+.orbit{
+  position: relative;
+  width: 90px;
+  height: 90px;
+}
+.orbit-dot{
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-top-color: #d4af37;
+  border-radius: 50%;
+  animation: spin 1.4s linear infinite;
+}
+.orbit-dot:nth-child(2){
+  inset: 12px;
+  border-top-color: #00ff88;
+  animation-duration: 1s;
+  animation-direction: reverse;
+}
+.orbit-dot:nth-child(3){
+  inset: 24px;
+  border-top-color: #ffffff;
+  animation-duration: .7s;
+}
+@keyframes spin{ to{ transform: rotate(360deg); } }`,
+        js: ``
+      },
+      {
+        titulo: "Card com efeito de tilt",
+        fonte: "Exemplo próprio",
+        tags: ["JavaScript", "CSS", "3D"],
+        html: `<div class="tilt-card"><span>Mova o mouse aqui</span></div>`,
+        css: `
+body{ display:flex; align-items:center; justify-content:center; }
+.tilt-card{
+  width: 220px;
+  height: 140px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(212,175,55,.25), rgba(0,255,136,.15));
+  border: 1px solid rgba(255,255,255,.18);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-family: Arial, sans-serif;
+  font-weight:700;
+  transform-style: preserve-3d;
+  transition: transform .12s ease;
+  will-change: transform;
+}`,
+        js: `
+const card = document.querySelector('.tilt-card');
+card.addEventListener('mousemove', (e) => {
+  const r = card.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width - 0.5;
+  const y = (e.clientY - r.top) / r.height - 0.5;
+  card.style.transform = 'rotateY(' + (x * 22) + 'deg) rotateX(' + (-y * 22) + 'deg)';
+});
+card.addEventListener('mouseleave', () => {
+  card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+});`
+      }
+    ];
+
+    /* ========================================================= */
+
+    function montarFonte(item){
+      // Monta as tags por concatenação (nunca escritas por extenso no
+      // arquivo). Isso evita dois problemas:
+      // 1) fechar o <script> real da página se algum editor "corrigir"
+      //    um escape sem querer;
+      // 2) o Live Server (auto-reload do VS Code) confundir a tag de
+      //    fechamento do body de mentira, que faz parte do preview de
+      //    cada snippet, com a tag real da página e injetar o script
+      //    dele bem no meio do nosso JavaScript.
+      const tag = (nome) => "<" + nome + ">";
+      const tagFecha = (nome) => "<" + "/" + nome + ">";
+      const abreScript = tag("script");
+      const fechaScript = tagFecha("script");
+
+      const partes = [
+        "<!doctype html>",
+        tag("html"),
+        tag("head"),
+        '<meta charset="utf-8">',
+        tag("style"),
+        "  html,body{",
+        "    margin:0; height:100%;",
+        "    display:flex; align-items:center; justify-content:center;",
+        "    background:#0a0a0a; color:#fff;",
+        "    font-family:Arial, sans-serif;",
+        "  }",
+        item.css || "",
+        tagFecha("style"),
+        tagFecha("head"),
+        tag("body"),
+        item.html || "",
+        abreScript + (item.js || "") + fechaScript,
+        tagFecha("body"),
+        tagFecha("html")
+      ];
+
+      return partes.join("\n");
+    }
+
+    function codigoLegivel(item){
+      let partes = [];
+      if(item.html && item.html.trim()) partes.push(`<!-- HTML -->\n${item.html.trim()}`);
+      if(item.css && item.css.trim()) partes.push(`/* CSS */\n${item.css.trim()}`);
+      if(item.js && item.js.trim()) partes.push(`// JavaScript\n${item.js.trim()}`);
+      return partes.join("\n\n");
+    }
+
+    function escapeHtml(str){
+      return str
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
+    }
+
+    function criarCardCodigo(item, idx){
+      const card = document.createElement("article");
+      card.className = "code-card";
+      card.style.animationDelay = (0.06 * (idx + 1)) + "s";
+
+      const tagsHtml = (item.tags || [])
+        .map(t => '<span class="code-tag">' + t + '</span>')
+        .join("");
+
+      card.innerHTML = `
+        <div class="code-window">
+          <div class="code-window-bar">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+            <span class="code-window-title">${item.titulo}</span>
+          </div>
+          <iframe class="code-preview" loading="lazy"></iframe>
+        </div>
+
+        <div class="code-info">
+          <div class="code-info-top">
+            <h2 class="code-title">${item.titulo}</h2>
+            <div class="code-tags">${tagsHtml}</div>
+          </div>
+          ${item.fonte ? ('<p class="code-fonte">Fonte: ' + item.fonte + '</p>') : ""}
+
+          <div class="code-actions">
+            <button class="btn-green btn-small btn-ver-codigo">Ver código</button>
+            <button class="btn-green btn-small btn-copiar">Copiar código</button>
+          </div>
+
+          <pre class="code-block" hidden><code></code></pre>
+        </div>
+      `;
+
+      const iframe = card.querySelector(".code-preview");
+      iframe.srcdoc = montarFonte(item);
+
+      const codeBlock = card.querySelector(".code-block");
+      const codeEl = codeBlock.querySelector("code");
+      const fonteTexto = codigoLegivel(item);
+      codeEl.innerHTML = escapeHtml(fonteTexto);
+
+      card.querySelector(".btn-ver-codigo").addEventListener("click", (e) => {
+        const escondido = codeBlock.hasAttribute("hidden");
+        if(escondido){
+          codeBlock.removeAttribute("hidden");
+          e.target.textContent = "Esconder código";
+        } else {
+          codeBlock.setAttribute("hidden", "");
+          e.target.textContent = "Ver código";
+        }
+      });
+
+      card.querySelector(".btn-copiar").addEventListener("click", async (e) => {
+        try{
+          await navigator.clipboard.writeText(fonteTexto);
+          const original = e.target.textContent;
+          e.target.textContent = "Copiado! ✅";
+          setTimeout(() => { e.target.textContent = original; }, 1600);
+        }catch(err){
+          alert("Não foi possível copiar automaticamente. Selecione o código manualmente.");
+        }
+      });
+
+      return card;
+    }
+
+    function renderizarCodigos(){
+      const grid = document.getElementById("codigos-grid");
+      if(!codeSnippets.length){
+        grid.innerHTML = `
+          <div class="about-card" style="grid-column: 1 / -1;">
+            <h2>Nenhum código cadastrado ainda</h2>
+            <p>Adicione itens no array <b>codeSnippets</b>, lá no início do script desta página.</p>
+          </div>`;
+        return;
+      }
+      codeSnippets.forEach((item, idx) => {
+        grid.appendChild(criarCardCodigo(item, idx));
+      });
+    }
+
+    renderizarCodigos();
+
+    function createStars() {
+      const container = document.getElementById('star-container');
+      if(!container) return;
+      container.innerHTML = "";
+      const starCount = 120;
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = (Math.random() * 3 + 1) + 'px';
+        star.style.width = size;
+        star.style.height = size;
+        star.style.top = Math.random() * 100 + 'vh';
+        star.style.left = Math.random() * 100 + 'vw';
+        star.style.animationDelay = Math.random() * 5 + 's';
+        container.appendChild(star);
+      }
+    }
+    createStars();
+  </script>
+
+</body>
+</html>

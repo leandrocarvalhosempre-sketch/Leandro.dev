@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vídeos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- seu CSS principal -->
+  <link rel="stylesheet" href="index.css" />
+
+  <style>
+    /* layout da página de vídeos seguindo seu padrão */
+    .videos-wrap{
+      max-width: 1100px;
+      margin: 20px auto 70px;
+      padding: 0 20px;
+    }
+
+    .videos-card{
+      text-align:center;
+      background: rgba(0,0,0,.60);
+      padding: 26px 18px;
+      border-radius: 20px;
+      border: 2px solid var(--gold2);
+      box-shadow: 0 0 25px rgba(212,175,55,0.18);
+      margin-bottom: 22px;
+    }
+
+    .videos-card h1{
+      margin: 0 0 10px;
+      color: var(--gold);
+      letter-spacing: .6px;
+    }
+
+    .videos-card p{
+      margin: 0;
+      color: rgba(248,245,245,.80);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 22px;
+      align-items: start;
+    }
+
+    .video-item{
+      position: relative;
+      background: rgba(8,8,8,.9);
+      border: 2px solid var(--gold2);
+      border-radius: 18px;
+      box-shadow: 0 0 25px rgba(212,175,55,0.18);
+      padding: 14px 0;
+      overflow: hidden;
+
+      opacity: 0;
+      transform: translateY(18px) scale(.985);
+      animation: fadeUp .55s ease forwards;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .video-item:hover{
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 0 28px rgba(212,175,55,0.24);
+    }
+
+    @keyframes fadeUp{
+      to{ opacity:1; transform: translateY(0) scale(1); }
+    }
+
+    /* iframe dev */
+    .tiktok-frame{
+      display:block;
+      margin: 0 auto;
+      border:none;
+      border-radius: 16px;
+      width: 325px;
+      height: 575px;
+      max-width: 100%;
+      background: #000;
+    }
+
+    /* loader */
+    .loader{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction: column;
+      gap: 10px;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(3px);
+      transition: opacity .25s ease;
+      pointer-events:none;
+    }
+
+    .spinner{
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,215,0,.25);
+      border-top-color: var(--gold);
+      animation: spin 0.9s linear infinite;
+      box-shadow: 0 0 18px rgba(255,215,0,.18);
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loader small{
+      color: rgba(248,245,245,.85);
+      letter-spacing: .2px;
+    }
+
+    .loader.hide{
+      opacity: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- fundo de estrelas (igual seu site) -->
+  <div id="star-container"></div>
+
+  <header>
+    <div><a href="index.html">Sobre mim</a></div>
+    <div><a href="codigos.html">Códigos</a></div>
+    <div><a href="contatos.html">Contatos</a></div>
+    <div><a href="videos.html">Vídeos</a></div>
+  </header>
+<main class="videos-wrap">
+  <!-- TIKTOK -->
+  <section class="videos-card">
+    <h1>🎬 Meus vídeos (TikTok)</h1>
+  </section>
+
+  <section class="grid" id="videos"></section>
+
+  <!-- YOUTUBE -->
+  <section class="videos-card" style="margin-top:40px;">
+    <h1>📺 Vídeos do YouTube</h1>
+    <p>Conteúdos publicados no canal</p>
+  </section>
+
+  <section class="grid" id="youtube-videos"></section>
+</main>
+
+<script>
+  // =========================
+  // TIKTOK (DEV iframe / PROD embed)
+  // =========================
+  const videoIds = [
+    "7591963308731714837",
+    "7591167628245339413",
+    "7589043710210444564",
+    "", "", "", "", "", "", ""
+  ];
+
+  const user = "leandrodelfinodec0";
+
+  const host = location.hostname;
+  const isLocal = (host === "localhost" || host === "127.0.0.1");
+
+  const idsValidos = videoIds
+    .map(v => (v || "").trim())
+    .filter(v => /^\d{10,25}$/.test(v))
+    .slice(0, 10);
+
+  const container = document.getElementById("videos");
+
+  function criarCardTikTok(id, idx) {
+    const card = document.createElement("div");
+    card.className = "video-item";
+    card.style.animationDelay = (0.06 * (idx + 1)) + "s";
+
+    const loader = document.createElement("div");
+    loader.className = "loader";
+    loader.innerHTML = `<div class="spinner"></div><small>Carregando…</small>`;
+    card.appendChild(loader);
+
+    if (isLocal) {
+      const iframe = document.createElement("iframe");
+      iframe.className = "tiktok-frame";
+      iframe.src = `https://www.tiktok.com/player/v1/${id}`;
+      iframe.allowFullscreen = true;
+
+      iframe.addEventListener("load", () => {
+        loader.classList.add("hide");
+        setTimeout(() => loader.remove(), 260);
+      });
+
+      card.appendChild(iframe);
+    } else {
+      const block = document.createElement("blockquote");
+      block.className = "tiktok-embed";
+      block.setAttribute("cite", `https://www.tiktok.com/@${user}/video/${id}`);
+      block.setAttribute("data-video-id", id);
+      block.style = "max-width:325px;margin:auto;";
+      block.innerHTML = "<section></section>";
+      card.appendChild(block);
+
+      const checker = setInterval(() => {
+        const hasIframe = card.querySelector("iframe");
+        if (hasIframe) {
+          clearInterval(checker);
+          loader.classList.add("hide");
+          setTimeout(() => loader.remove(), 260);
+        }
+      }, 300);
+
+      setTimeout(() => {
+        if (loader.isConnected) {
+          loader.classList.add("hide");
+          setTimeout(() => loader.remove(), 260);
+        }
+      }, 3500);
+    }
+
+    container.appendChild(card);
+  }
+
+  if (idsValidos.length === 0) {
+    container.innerHTML = `
+      <div class="videos-card" style="grid-column: 1 / -1;">
+        <h1 style="margin:0 0 10px;color:var(--gold);">Sem vídeos cadastrados</h1>
+        <p style="margin:0;color:rgba(248,245,245,.8);">
+          Cole IDs de vídeos do TikTok no array <b>videoIds</b> (links com <b>/video/</b>).
+        </p>
+      </div>
+    `;
+  } else {
+    idsValidos.forEach(criarCardTikTok);
+  }
+
+  if (!isLocal) {
+    const s = document.createElement("script");
+    s.async = true;
+    s.src = "https://www.tiktok.com/embed.js";
+    document.body.appendChild(s);
+  }
+
+  // =========================
+  // YOUTUBE (sempre funciona)
+  // =========================
+  // Coloque aqui os IDs do YouTube (NÃO o link inteiro)
+  const youtubeIds = [
+  "1JOGbOS_WiM", "CqxiYq8n228"
+
+    // exemplo: "dQw4w9WgXcQ",
+    // "ABC123XYZ90",
+  ];
+
+  const ytContainer = document.getElementById("youtube-videos");
+
+  function criarCardYouTube(id, idx) {
+    const card = document.createElement("div");
+    card.className = "video-item";
+    card.style.animationDelay = (0.06 * (idx + 1)) + "s";
+
+    const loader = document.createElement("div");
+    loader.className = "loader";
+    loader.innerHTML = `<div class="spinner"></div><small>Carregando…</small>`;
+    card.appendChild(loader);
+
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://www.youtube.com/embed/${id}`;
+    iframe.width = "100%";
+    iframe.height = "315";
+    iframe.style.border = "none";
+    iframe.style.borderRadius = "14px";
+    iframe.allow =
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.allowFullscreen = true;
+
+    iframe.addEventListener("load", () => {
+      loader.classList.add("hide");
+      setTimeout(() => loader.remove(), 250);
+    });
+
+    card.appendChild(iframe);
+    ytContainer.appendChild(card);
+  }
+
+  const ytValidos = youtubeIds
+    .map(v => (v || "").trim())
+    .filter(v => /^[a-zA-Z0-9_-]{6,20}$/.test(v))
+    .slice(0, 10);
+
+  if (ytValidos.length === 0) {
+    ytContainer.innerHTML = `
+      <div class="videos-card" style="grid-column: 1 / -1;">
+        <h1 style="margin:0 0 10px;color:var(--gold);">Sem vídeos do YouTube</h1>
+        <p style="margin:0;color:rgba(248,245,245,.8);">
+          Cole IDs do YouTube no array <b>youtubeIds</b> (ex: do link <b>?v=ID</b>).
+        </p>
+      </div>
+    `;
+  } else {
+    ytValidos.forEach(criarCardYouTube);
+  }
+
+  // =========================
+  // ESTRELAS (igual ao index)
+  // =========================
+  function createStars() {
+    const starContainer = document.getElementById('star-container');
+    const starCount = 120;
+    for (let i = 0; i < starCount; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = (Math.random() * 4) + 'px';
+      star.style.width = size;
+      star.style.height = size;
+      star.style.top = Math.random() * 100 + 'vh';
+      star.style.left = Math.random() * 100 + 'vw';
+      star.style.animationDelay = Math.random() * 5 + 's';
+      starContainer.appendChild(star);
+    }
+  }
+  createStars();
+</script>

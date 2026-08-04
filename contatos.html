@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contatos | Leandro D. de Carvalho</title>
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+
+  <div id="star-container"></div>
+
+  <header>
+    <div><a href="index.html">Sobre mim</a></div>
+    <div><a href="codigos.html">Códigos</a></div>
+    <div><a href="contatos.html">Contatos</a></div>
+    <div><a href="videos.html">Vídeos</a></div>
+  </header>
+
+  <main class="page-wrap">
+    <section class="contato-container">
+      <div class="contact-card">
+        <h1>📩 Contato</h1>
+        <p>Me chama nas redes ou envie uma mensagem rápida aqui embaixo.</p>
+
+        <div class="social-icons">
+
+          <a class="social-btn social-tiktok" href="https://www.tiktok.com" target="_blank" rel="noopener">
+            <span class="social-ic" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="svg-ic">
+                <path d="M16.6 5.82c.73.68 1.67 1.11 2.7 1.18v3.02c-1.7-.06-3.27-.72-4.4-1.77v7.13c0 2.99-2.43 5.42-5.42 5.42S4.06 18.39 4.06 15.4c0-2.99 2.43-5.42 5.42-5.42.3 0 .6.02.9.08v3.14c-.28-.1-.58-.16-.9-.16-1.29 0-2.34 1.05-2.34 2.34s1.05 2.34 2.34 2.34 2.34-1.05 2.34-2.34V3.4h3.2c.12.92.56 1.77 1.26 2.42z"/>
+              </svg>
+            </span>
+            TikTok
+          </a>
+
+          <a class="social-btn social-facebook" href="https://facebook.com" target="_blank" rel="noopener">
+            <span class="social-ic" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="svg-ic">
+                <path d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.87.24-1.46 1.5-1.46h1.7V5c-.3-.04-1.34-.13-2.55-.13-2.53 0-4.26 1.54-4.26 4.37V11H7.2v3h2.7v8h3.6z"/>
+              </svg>
+            </span>
+            Facebook
+          </a>
+
+          <a class="social-btn social-instagram" href="https://instagram.com" target="_blank" rel="noopener">
+            <span class="social-ic" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="svg-ic">
+                <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm9 2h-9A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9A3.5 3.5 0 0 0 20 16.5v-9A3.5 3.5 0 0 0 16.5 4z"/>
+                <path d="M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+                <path d="M17.8 6.2a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+              </svg>
+            </span>
+            Instagram
+          </a>         
+
+        </div>
+
+        <button class="btn-green" onclick="window.location.href='mailto:seuemail@exemplo.com?subject=Contato%20pelo%20site'">
+          ✉ Enviar e-mail
+        </button>
+
+        <div class="form-card">
+          <h2>Enviar mensagem (rápido)</h2>
+
+          <label>Seu nome</label>
+          <input id="nome" placeholder="Ex.: João" />
+
+          <label>Assunto</label>
+          <input id="assunto" placeholder="Projeto / Parceria / Dúvida" />
+
+          <label>Mensagem</label>
+          <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
+
+          <button class="btn-green" onclick="enviarEmail()">Enviar mensagem</button>
+          <p class="mini">Isso abre seu e-mail já preenchido (funciona bem no celular).</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function createStars() {
+      const container = document.getElementById('star-container');
+      if(!container) return;
+      container.innerHTML = "";
+      const starCount = 120;
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = (Math.random() * 3 + 1) + 'px';
+        star.style.width = size;
+        star.style.height = size;
+        star.style.top = Math.random() * 100 + 'vh';
+        star.style.left = Math.random() * 100 + 'vw';
+        star.style.animationDelay = Math.random() * 5 + 's';
+        container.appendChild(star);
+      }
+    }
+    createStars();
+
+    function enviarEmail(){
+      const nome = document.getElementById("nome").value.trim();
+      const assunto = document.getElementById("assunto").value.trim();
+      const msg = document.getElementById("mensagem").value.trim();
+
+      const subject = encodeURIComponent((assunto || "Contato pelo site") + (nome ? " - " + nome : ""));
+      const body = encodeURIComponent(msg || "Olá! Vi seu site e gostaria de conversar.");
+
+      window.location.href = `mailto:seuemail@exemplo.com?subject=${subject}&body=${body}`;
+    }
+  </script>
+
+</body>
+</html>
