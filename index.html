@@ -43,7 +43,26 @@
       pronto para colocar em prática tudo que venho estudando.</p>
     </section>
 
+    <section class="qr-card">
+      <h2>📱 Acesse pelo celular</h2>
+      <p>Aponte a câmera do seu celular para o código abaixo e o site abre direto no navegador.</p>
+      <div class="qr-box" id="qrcode"></div>
+      <p class="qr-link">leandro-dev.vercel.app</p>
+    </section>
+
   </main>
+
+  <script src="qrcode.min.js"></script>
+  <script>
+    new QRCode(document.getElementById("qrcode"), {
+      text: "https://leandro-dev.vercel.app/index.html",
+      width: 180,
+      height: 180,
+      colorDark: "#0a0a0a",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  </script>
 
   <script>
     function createStars() {
