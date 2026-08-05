@@ -368,6 +368,43 @@ input:focus, textarea:focus{
 }
 
 /* =========================
+   QR CODE (pág. Sobre mim)
+========================= */
+.qr-card{
+  margin-top: 22px;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 22px;
+  padding: 26px 20px;
+  box-shadow: 0 0 25px rgba(212,175,55,0.18);
+  text-align: center;
+}
+
+.qr-card h2{ margin: 0 0 8px; color: var(--gold); }
+
+.qr-card p{
+  margin: 0 0 18px;
+  color: rgba(255,255,255,.85);
+  line-height: 1.5;
+}
+
+.qr-box{
+  display: inline-block;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 16px;
+  line-height: 0;
+}
+
+.qr-link{
+  margin: 14px 0 0 !important;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  color: var(--green) !important;
+  font-size: 14px;
+}
+
+/* =========================
    CÓDIGOS
 ========================= */
 .codigos-grid{
