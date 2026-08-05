@@ -435,7 +435,7 @@ function drawBow(){
   ctx.lineWidth = 5;
   ctx.beginPath();
   ctx.moveTo(anchor.x, anchor.y - 70);
-  ctx.quadraticCurveTo(anchor.x - 34, anchor.y, anchor.x, anchor.y + 70);
+  ctx.quadraticCurveTo(anchor.x + 34, anchor.y, anchor.x, anchor.y + 70);
   ctx.stroke();
 
   ctx.strokeStyle = "rgba(255,255,255,.85)";
@@ -518,55 +518,61 @@ function loop(){
 loop();`
       },
       {
-        titulo: "Visualização do Insertion Sort",
+        titulo: "Jogo de ordenar (arraste e solte)",
         fonte: "Recriado por Leandro, inspirado em posts de UI",
-        tags: ["JavaScript", "Algoritmos", "Ordenação"],
-        previewAltura: 480,
-        html: '<div class="ins-wrap"><div class="ins-bars" id="insBars"></div><pre class="ins-code" id="insCode"></pre><button class="ins-btn" id="insRestart">Embaralhar e reiniciar</button></div>',
+        tags: ["JavaScript", "Jogo", "Arraste e solte"],
+        previewAltura: 380,
+        html: '<div class="ord-wrap"><p class="ord-instr">Arraste as barras para colocar os números em ordem crescente</p><div class="ord-bars" id="ordBars"></div><div class="ord-status" id="ordStatus">Movimentos: 0</div><button class="ord-btn" id="ordShuffle">Embaralhar de novo</button></div>',
         css: `
 body{ background:#0d1117; display:flex; align-items:center; justify-content:center; }
-.ins-wrap{ font-family: Arial, sans-serif; color:#c9d1d9; width: 92%; max-width: 520px; }
-.ins-bars{
+.ord-wrap{ font-family: Arial, sans-serif; color:#c9d1d9; width: 92%; max-width: 480px; text-align:center; }
+.ord-instr{ margin:0 0 16px; font-size:13px; color:rgba(255,255,255,.65); }
+.ord-bars{
   display:flex;
   align-items:flex-end;
-  gap:6px;
-  height:150px;
-  margin-bottom:14px;
-  padding: 0 4px;
+  gap:8px;
+  height:160px;
+  padding: 20px 4px 0;
+  justify-content:center;
 }
-.ins-bar{
-  flex:1;
-  background:#3a4b63;
-  border-radius:4px 4px 0 0;
-  position:relative;
-  transition: height .25s ease, background .25s ease;
+.ord-bar{
+  width: 42px;
+  background: linear-gradient(180deg, #3a4b63, #2a384a);
+  border-radius: 6px 6px 3px 3px;
+  position: relative;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
   display:flex;
   align-items:flex-start;
   justify-content:center;
+  transition: border-color .15s ease;
+  border: 2px solid transparent;
 }
-.ins-bar span{
+.ord-bar span{
   position:absolute;
-  top:-20px;
-  font-size:12px;
-  font-weight:700;
+  top:-22px;
+  font-size:13px;
+  font-weight:800;
   color:#c9d1d9;
 }
-.ins-bar.key{ background:#ffb020; }
-.ins-bar.compare{ background:#ff5f56; }
-.ins-bar.done{ background:#00cc66; }
-.ins-code{
-  background:#0a0e14;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:10px;
-  padding:14px 16px;
-  font-size:12.5px;
-  line-height:1.7;
-  overflow-x:auto;
-  margin: 0 0 14px;
+.ord-bar.arrastando{
+  cursor: grabbing;
+  z-index: 5;
+  border-color: #ffb020;
+  box-shadow: 0 6px 14px rgba(0,0,0,.4);
 }
-.ins-code div{ white-space:pre; padding:1px 6px; border-radius:4px; }
-.ins-code div.ativa{ background:rgba(0,255,136,.18); color:#7cffc4; }
-.ins-btn{
+.ord-bar.alvo{
+  border-color: #00ff88;
+}
+.ord-status{
+  margin-top:16px;
+  font-weight:800;
+  font-size:14px;
+}
+.ord-status.venceu{ color:#00ff88; }
+.ord-btn{
+  margin-top:14px;
   padding:10px 16px;
   border:none;
   border-radius:10px;
@@ -576,126 +582,105 @@ body{ background:#0d1117; display:flex; align-items:center; justify-content:cent
   cursor:pointer;
 }`,
         js: `
-var linhas = [
-  "def insertion_sort(a):",
-  "    n = len(a)",
-  "    for i in range(1, n):",
-  "        key = a[i]",
-  "        j = i",
-  "        while j > 0 and a[j - 1] > key:",
-  "            a[j] = a[j - 1]",
-  "            j -= 1",
-  "        a[j] = key"
-];
-
-var codeEl = document.getElementById("insCode");
-var linhaEls = [];
-for (var i = 0; i < linhas.length; i++){
-  var div = document.createElement("div");
-  div.textContent = linhas[i];
-  codeEl.appendChild(div);
-  linhaEls.push(div);
-}
-
-var barsEl = document.getElementById("insBars");
+var arr = [];
+var movimentos = 0;
+var arrastandoIndex = null;
+var pointerStartX = 0;
 var barEls = [];
 
-function novoArray(){
-  var arr = [];
-  for (var i = 0; i < 9; i++){ arr.push(1 + Math.floor(Math.random() * 40)); }
-  return arr;
+var barsEl = document.getElementById("ordBars");
+var statusEl = document.getElementById("ordStatus");
+
+function embaralhar(){
+  var vals = [5, 10, 15, 20, 25, 30, 35];
+  for (var i = vals.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = vals[i]; vals[i] = vals[j]; vals[j] = t;
+  }
+  arr = vals;
+  movimentos = 0;
+  arrastandoIndex = null;
+  renderizar();
+  atualizarStatus();
 }
 
-function construirBarras(arr){
+function encontrarIndicePorX(clientX){
+  for (var i = 0; i < barEls.length; i++){
+    var rect = barEls[i].getBoundingClientRect();
+    var meio = rect.left + rect.width / 2;
+    if (clientX < meio) return i;
+  }
+  return barEls.length - 1;
+}
+
+function renderizar(){
   barsEl.innerHTML = "";
   barEls = [];
   var max = Math.max.apply(null, arr);
-  for (var i = 0; i < arr.length; i++){
+
+  arr.forEach(function(valor, i){
     var bar = document.createElement("div");
-    bar.className = "ins-bar";
-    bar.style.height = (14 + (arr[i] / max) * 120) + "px";
+    bar.className = "ord-bar";
+    bar.style.height = (16 + (valor / max) * 130) + "px";
+
     var label = document.createElement("span");
-    label.textContent = arr[i];
+    label.textContent = valor;
     bar.appendChild(label);
+
+    bar.addEventListener("pointerdown", function(e){
+      arrastandoIndex = i;
+      pointerStartX = e.clientX;
+      bar.setPointerCapture(e.pointerId);
+      bar.classList.add("arrastando");
+    });
+
+    bar.addEventListener("pointermove", function(e){
+      if (arrastandoIndex !== i) return;
+      var dx = e.clientX - pointerStartX;
+      bar.style.transform = "translateX(" + dx + "px)";
+      var alvo = encontrarIndicePorX(e.clientX);
+      barEls.forEach(function(b, idx){
+        b.classList.toggle("alvo", idx === alvo && idx !== arrastandoIndex);
+      });
+    });
+
+    bar.addEventListener("pointerup", function(e){
+      if (arrastandoIndex !== i) return;
+      var alvo = encontrarIndicePorX(e.clientX);
+      bar.style.transform = "";
+      barEls.forEach(function(b){ b.classList.remove("alvo"); });
+      if (alvo !== arrastandoIndex){
+        var item = arr.splice(arrastandoIndex, 1)[0];
+        arr.splice(alvo, 0, item);
+        movimentos += 1;
+      }
+      arrastandoIndex = null;
+      renderizar();
+      atualizarStatus();
+    });
+
     barsEl.appendChild(bar);
     barEls.push(bar);
-  }
+  });
 }
 
-function gerarPassos(arrOriginal){
-  var passos = [];
-  var a = arrOriginal.slice();
-  var n = a.length;
-  passos.push({ arr: a.slice(), linha: 2, ativo: null, comparando: null });
-  for (var i = 1; i < n; i++){
-    passos.push({ arr: a.slice(), linha: 3, ativo: i, comparando: null });
-    var key = a[i];
-    var j = i;
-    passos.push({ arr: a.slice(), linha: 4, ativo: i, comparando: null });
-    passos.push({ arr: a.slice(), linha: 5, ativo: i, comparando: null });
-    while (j > 0 && a[j - 1] > key){
-      passos.push({ arr: a.slice(), linha: 6, ativo: j, comparando: j - 1 });
-      a[j] = a[j - 1];
-      passos.push({ arr: a.slice(), linha: 7, ativo: j, comparando: j - 1 });
-      j -= 1;
-      passos.push({ arr: a.slice(), linha: 8, ativo: j, comparando: null });
-    }
-    a[j] = key;
-    passos.push({ arr: a.slice(), linha: 9, ativo: j, comparando: null });
+function atualizarStatus(){
+  var ordenado = true;
+  for (var i = 1; i < arr.length; i++){
+    if (arr[i] < arr[i - 1]) { ordenado = false; break; }
   }
-  passos.push({ arr: a.slice(), linha: null, ativo: null, comparando: null, feito: true });
-  return passos;
-}
-
-var passos = [];
-var passoAtual = 0;
-var timer = null;
-
-function desenharPasso(){
-  var passo = passos[passoAtual];
-  var max = Math.max.apply(null, passo.arr);
-
-  for (var i = 0; i < barEls.length; i++){
-    var bar = barEls[i];
-    bar.style.height = (14 + (passo.arr[i] / max) * 120) + "px";
-    bar.querySelector("span").textContent = passo.arr[i];
-    bar.className = "ins-bar";
-    if (passo.feito){
-      bar.classList.add("done");
-    } else if (i === passo.comparando){
-      bar.classList.add("compare");
-    } else if (i === passo.ativo){
-      bar.classList.add("key");
-    }
-  }
-
-  for (var l = 0; l < linhaEls.length; l++){
-    linhaEls[l].className = (passo.linha === l + 1) ? "ativa" : "";
-  }
-}
-
-function proximoPasso(){
-  if (passoAtual < passos.length - 1){
-    passoAtual += 1;
-    desenharPasso();
+  if (ordenado){
+    statusEl.textContent = "Você ordenou em " + movimentos + " movimentos!";
+    statusEl.className = "ord-status venceu";
   } else {
-    clearInterval(timer);
+    statusEl.textContent = "Movimentos: " + movimentos;
+    statusEl.className = "ord-status";
   }
 }
 
-function iniciar(){
-  clearInterval(timer);
-  var arr = novoArray();
-  construirBarras(arr);
-  passos = gerarPassos(arr);
-  passoAtual = 0;
-  desenharPasso();
-  timer = setInterval(proximoPasso, 550);
-}
+document.getElementById("ordShuffle").addEventListener("click", embaralhar);
 
-document.getElementById("insRestart").addEventListener("click", iniciar);
-
-iniciar();`
+embaralhar();`
       }
     ];
 
