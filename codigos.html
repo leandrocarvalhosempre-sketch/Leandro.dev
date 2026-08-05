@@ -27,6 +27,8 @@
 
     <section class="codigos-grid" id="codigos-grid"></section>
 
+    <nav class="codigos-paginacao" id="codigos-paginacao"></nav>
+
   </main>
 
   <script>
@@ -337,6 +339,363 @@ card.addEventListener('mouseleave', () => {
 '  box-shadow: 0 0 10px rgba(0,255,136,.8);\n' +
 '}',
         js: ''
+      },
+      {
+        titulo: "Bow Game (arco e flecha)",
+        fonte: "Recriado por Leandro, inspirado em posts de UI",
+        tags: ["JavaScript", "Canvas", "Jogo"],
+        html: '<div class="bow-wrap"><canvas id="bowCanvas" width="560" height="300"></canvas><div class="bow-score">Pontos: <span id="score">0</span></div><div class="bow-hint">Clique e arraste pra puxar o arco, solte pra atirar</div></div>',
+        css: `
+body{ background:#0b1a12; display:flex; align-items:center; justify-content:center; }
+.bow-wrap{ text-align:center; font-family: Arial, sans-serif; color:#eaf7ea; }
+#bowCanvas{
+  background: linear-gradient(#7ec8e3, #cfead0);
+  border-radius: 14px;
+  border: 2px solid rgba(255,255,255,.25);
+  touch-action: none;
+  cursor: crosshair;
+  max-width: 100%;
+}
+.bow-score{ margin-top:10px; font-weight:800; font-size:15px; }
+.bow-hint{ margin-top:4px; font-size:12px; color:rgba(255,255,255,.6); }`,
+        js: `
+var canvas = document.getElementById("bowCanvas");
+var ctx = canvas.getContext("2d");
+var W = canvas.width, H = canvas.height;
+var anchor = { x: 70, y: H / 2 };
+var target = { x: W - 70, y: H / 2, r: 28, baseY: H / 2 };
+var arrows = [];
+var score = 0;
+var scoreEl = document.getElementById("score");
+var dragging = false;
+var pull = { x: anchor.x, y: anchor.y };
+var maxPull = 70;
+var startTime = performance.now();
+
+function getPos(evt){
+  var rect = canvas.getBoundingClientRect();
+  var scaleX = canvas.width / rect.width;
+  var scaleY = canvas.height / rect.height;
+  var clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+  var clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+  return {
+    x: (clientX - rect.left) * scaleX,
+    y: (clientY - rect.top) * scaleY
+  };
+}
+
+function clampPull(p){
+  var dx = p.x - anchor.x;
+  var dy = p.y - anchor.y;
+  var dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist > maxPull){
+    dx = dx / dist * maxPull;
+    dy = dy / dist * maxPull;
+  }
+  return { x: anchor.x + dx, y: anchor.y + dy };
+}
+
+function solta(){
+  if (!dragging) return;
+  dragging = false;
+  var dx = anchor.x - pull.x;
+  var dy = anchor.y - pull.y;
+  arrows.push({ x: anchor.x, y: anchor.y, vx: dx * 0.18, vy: dy * 0.18, hit: false });
+  pull = { x: anchor.x, y: anchor.y };
+}
+
+canvas.addEventListener("mousedown", function(e){ dragging = true; pull = clampPull(getPos(e)); });
+canvas.addEventListener("mousemove", function(e){ if (dragging) pull = clampPull(getPos(e)); });
+window.addEventListener("mouseup", solta);
+
+canvas.addEventListener("touchstart", function(e){ dragging = true; pull = clampPull(getPos(e)); e.preventDefault(); }, { passive: false });
+canvas.addEventListener("touchmove", function(e){ if (dragging) pull = clampPull(getPos(e)); e.preventDefault(); }, { passive: false });
+window.addEventListener("touchend", solta);
+
+function drawBackground(){
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "rgba(255,255,255,.15)";
+  ctx.fillRect(0, H - 30, W, 30);
+}
+
+function drawTarget(){
+  var rings = ["#ffffff", "#ff4d4d", "#ffffff", "#333333"];
+  for (var i = 0; i < rings.length; i++){
+    var rr = target.r - i * 7;
+    if (rr <= 0) break;
+    ctx.beginPath();
+    ctx.fillStyle = rings[i];
+    ctx.arc(target.x, target.y, rr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawBow(){
+  ctx.strokeStyle = "#5b3a1e";
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(anchor.x, anchor.y - 70);
+  ctx.quadraticCurveTo(anchor.x - 34, anchor.y, anchor.x, anchor.y + 70);
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(255,255,255,.85)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(anchor.x, anchor.y - 70);
+  ctx.lineTo(pull.x, pull.y);
+  ctx.lineTo(anchor.x, anchor.y + 70);
+  ctx.stroke();
+
+  var dx = anchor.x - pull.x;
+  var dy = anchor.y - pull.y;
+  var len = Math.sqrt(dx * dx + dy * dy) || 1;
+  var ux = dx / len, uy = dy / len;
+  ctx.strokeStyle = "#e8d9b0";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(pull.x, pull.y);
+  ctx.lineTo(pull.x + ux * 40, pull.y + uy * 40);
+  ctx.stroke();
+}
+
+function updateArrows(){
+  for (var i = arrows.length - 1; i >= 0; i--){
+    var a = arrows[i];
+    if (a.hit) continue;
+    a.x += a.vx;
+    a.y += a.vy;
+    var ddx = a.x - target.x;
+    var ddy = a.y - target.y;
+    if (Math.sqrt(ddx * ddx + ddy * ddy) < target.r){
+      a.hit = true;
+      score += 1;
+      scoreEl.textContent = score;
+    }
+    if (a.x > W + 20 || a.x < -20 || a.y < -20 || a.y > H + 20){
+      arrows.splice(i, 1);
+    }
+  }
+}
+
+function drawArrows(){
+  ctx.strokeStyle = "#3a2b1a";
+  ctx.lineWidth = 3;
+  for (var i = 0; i < arrows.length; i++){
+    var a = arrows[i];
+    if (a.hit) continue;
+    var angle = Math.atan2(a.vy, a.vx);
+    ctx.save();
+    ctx.translate(a.x, a.y);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(-18, 0);
+    ctx.lineTo(6, 0);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(6, 0);
+    ctx.lineTo(0, -4);
+    ctx.lineTo(0, 4);
+    ctx.closePath();
+    ctx.fillStyle = "#3a2b1a";
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function loop(){
+  var t = performance.now() - startTime;
+  target.y = target.baseY + Math.sin(t * 0.0015) * 70;
+
+  drawBackground();
+  drawTarget();
+  updateArrows();
+  drawArrows();
+  drawBow();
+
+  requestAnimationFrame(loop);
+}
+
+loop();`
+      },
+      {
+        titulo: "Visualização do Insertion Sort",
+        fonte: "Recriado por Leandro, inspirado em posts de UI",
+        tags: ["JavaScript", "Algoritmos", "Ordenação"],
+        previewAltura: 480,
+        html: '<div class="ins-wrap"><div class="ins-bars" id="insBars"></div><pre class="ins-code" id="insCode"></pre><button class="ins-btn" id="insRestart">Embaralhar e reiniciar</button></div>',
+        css: `
+body{ background:#0d1117; display:flex; align-items:center; justify-content:center; }
+.ins-wrap{ font-family: Arial, sans-serif; color:#c9d1d9; width: 92%; max-width: 520px; }
+.ins-bars{
+  display:flex;
+  align-items:flex-end;
+  gap:6px;
+  height:150px;
+  margin-bottom:14px;
+  padding: 0 4px;
+}
+.ins-bar{
+  flex:1;
+  background:#3a4b63;
+  border-radius:4px 4px 0 0;
+  position:relative;
+  transition: height .25s ease, background .25s ease;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+.ins-bar span{
+  position:absolute;
+  top:-20px;
+  font-size:12px;
+  font-weight:700;
+  color:#c9d1d9;
+}
+.ins-bar.key{ background:#ffb020; }
+.ins-bar.compare{ background:#ff5f56; }
+.ins-bar.done{ background:#00cc66; }
+.ins-code{
+  background:#0a0e14;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:12.5px;
+  line-height:1.7;
+  overflow-x:auto;
+  margin: 0 0 14px;
+}
+.ins-code div{ white-space:pre; padding:1px 6px; border-radius:4px; }
+.ins-code div.ativa{ background:rgba(0,255,136,.18); color:#7cffc4; }
+.ins-btn{
+  padding:10px 16px;
+  border:none;
+  border-radius:10px;
+  background:#00cc66;
+  color:#07140c;
+  font-weight:900;
+  cursor:pointer;
+}`,
+        js: `
+var linhas = [
+  "def insertion_sort(a):",
+  "    n = len(a)",
+  "    for i in range(1, n):",
+  "        key = a[i]",
+  "        j = i",
+  "        while j > 0 and a[j - 1] > key:",
+  "            a[j] = a[j - 1]",
+  "            j -= 1",
+  "        a[j] = key"
+];
+
+var codeEl = document.getElementById("insCode");
+var linhaEls = [];
+for (var i = 0; i < linhas.length; i++){
+  var div = document.createElement("div");
+  div.textContent = linhas[i];
+  codeEl.appendChild(div);
+  linhaEls.push(div);
+}
+
+var barsEl = document.getElementById("insBars");
+var barEls = [];
+
+function novoArray(){
+  var arr = [];
+  for (var i = 0; i < 9; i++){ arr.push(1 + Math.floor(Math.random() * 40)); }
+  return arr;
+}
+
+function construirBarras(arr){
+  barsEl.innerHTML = "";
+  barEls = [];
+  var max = Math.max.apply(null, arr);
+  for (var i = 0; i < arr.length; i++){
+    var bar = document.createElement("div");
+    bar.className = "ins-bar";
+    bar.style.height = (14 + (arr[i] / max) * 120) + "px";
+    var label = document.createElement("span");
+    label.textContent = arr[i];
+    bar.appendChild(label);
+    barsEl.appendChild(bar);
+    barEls.push(bar);
+  }
+}
+
+function gerarPassos(arrOriginal){
+  var passos = [];
+  var a = arrOriginal.slice();
+  var n = a.length;
+  passos.push({ arr: a.slice(), linha: 2, ativo: null, comparando: null });
+  for (var i = 1; i < n; i++){
+    passos.push({ arr: a.slice(), linha: 3, ativo: i, comparando: null });
+    var key = a[i];
+    var j = i;
+    passos.push({ arr: a.slice(), linha: 4, ativo: i, comparando: null });
+    passos.push({ arr: a.slice(), linha: 5, ativo: i, comparando: null });
+    while (j > 0 && a[j - 1] > key){
+      passos.push({ arr: a.slice(), linha: 6, ativo: j, comparando: j - 1 });
+      a[j] = a[j - 1];
+      passos.push({ arr: a.slice(), linha: 7, ativo: j, comparando: j - 1 });
+      j -= 1;
+      passos.push({ arr: a.slice(), linha: 8, ativo: j, comparando: null });
+    }
+    a[j] = key;
+    passos.push({ arr: a.slice(), linha: 9, ativo: j, comparando: null });
+  }
+  passos.push({ arr: a.slice(), linha: null, ativo: null, comparando: null, feito: true });
+  return passos;
+}
+
+var passos = [];
+var passoAtual = 0;
+var timer = null;
+
+function desenharPasso(){
+  var passo = passos[passoAtual];
+  var max = Math.max.apply(null, passo.arr);
+
+  for (var i = 0; i < barEls.length; i++){
+    var bar = barEls[i];
+    bar.style.height = (14 + (passo.arr[i] / max) * 120) + "px";
+    bar.querySelector("span").textContent = passo.arr[i];
+    bar.className = "ins-bar";
+    if (passo.feito){
+      bar.classList.add("done");
+    } else if (i === passo.comparando){
+      bar.classList.add("compare");
+    } else if (i === passo.ativo){
+      bar.classList.add("key");
+    }
+  }
+
+  for (var l = 0; l < linhaEls.length; l++){
+    linhaEls[l].className = (passo.linha === l + 1) ? "ativa" : "";
+  }
+}
+
+function proximoPasso(){
+  if (passoAtual < passos.length - 1){
+    passoAtual += 1;
+    desenharPasso();
+  } else {
+    clearInterval(timer);
+  }
+}
+
+function iniciar(){
+  clearInterval(timer);
+  var arr = novoArray();
+  construirBarras(arr);
+  passos = gerarPassos(arr);
+  passoAtual = 0;
+  desenharPasso();
+  timer = setInterval(proximoPasso, 550);
+}
+
+document.getElementById("insRestart").addEventListener("click", iniciar);
+
+iniciar();`
       }
     ];
 
@@ -434,6 +793,9 @@ card.addEventListener('mouseleave', () => {
 
       const iframe = card.querySelector(".code-preview");
       iframe.srcdoc = montarFonte(item);
+      if (item.previewAltura){
+        iframe.style.height = item.previewAltura + "px";
+      }
 
       const codeBlock = card.querySelector(".code-block");
       const codeEl = codeBlock.querySelector("code");
@@ -465,19 +827,74 @@ card.addEventListener('mouseleave', () => {
       return card;
     }
 
+    var PAGINA_TAMANHO = 4;
+    var paginaAtual = 1;
+
+    function totalPaginas(){
+      return Math.max(1, Math.ceil(codeSnippets.length / PAGINA_TAMANHO));
+    }
+
     function renderizarCodigos(){
       const grid = document.getElementById("codigos-grid");
+      grid.innerHTML = "";
+
       if(!codeSnippets.length){
         grid.innerHTML = `
           <div class="about-card" style="grid-column: 1 / -1;">
             <h2>Nenhum código cadastrado ainda</h2>
             <p>Adicione itens no array <b>codeSnippets</b>, lá no início do script desta página.</p>
           </div>`;
+        document.getElementById("codigos-paginacao").innerHTML = "";
         return;
       }
-      codeSnippets.forEach((item, idx) => {
-        grid.appendChild(criarCardCodigo(item, idx));
+
+      const inicio = (paginaAtual - 1) * PAGINA_TAMANHO;
+      const itensDaPagina = codeSnippets.slice(inicio, inicio + PAGINA_TAMANHO);
+
+      itensDaPagina.forEach((item, idxLocal) => {
+        grid.appendChild(criarCardCodigo(item, idxLocal));
       });
+
+      renderizarPaginacao();
+    }
+
+    function irParaPagina(p){
+      paginaAtual = p;
+      renderizarCodigos();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderizarPaginacao(){
+      const nav = document.getElementById("codigos-paginacao");
+      nav.innerHTML = "";
+      const total = totalPaginas();
+      if (total <= 1) return;
+
+      const btnAnterior = document.createElement("button");
+      btnAnterior.className = "pag-btn";
+      btnAnterior.textContent = "‹ Anterior";
+      btnAnterior.disabled = paginaAtual === 1;
+      btnAnterior.addEventListener("click", () => {
+        if (paginaAtual > 1) irParaPagina(paginaAtual - 1);
+      });
+      nav.appendChild(btnAnterior);
+
+      for (let p = 1; p <= total; p++){
+        const btn = document.createElement("button");
+        btn.className = "pag-btn" + (p === paginaAtual ? " ativo" : "");
+        btn.textContent = String(p);
+        btn.addEventListener("click", () => irParaPagina(p));
+        nav.appendChild(btn);
+      }
+
+      const btnProximo = document.createElement("button");
+      btnProximo.className = "pag-btn";
+      btnProximo.textContent = "Próxima ›";
+      btnProximo.disabled = paginaAtual === total;
+      btnProximo.addEventListener("click", () => {
+        if (paginaAtual < total) irParaPagina(paginaAtual + 1);
+      });
+      nav.appendChild(btnProximo);
     }
 
     renderizarCodigos();
