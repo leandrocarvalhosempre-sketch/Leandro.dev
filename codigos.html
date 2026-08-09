@@ -681,6 +681,539 @@ function atualizarStatus(){
 document.getElementById("ordShuffle").addEventListener("click", embaralhar);
 
 embaralhar();`
+      },
+      {
+        titulo: "Login vidro escuro (glassmorphism)",
+        fonte: "Recriado por Leandro, inspirado em posts de UI",
+        tags: ["CSS", "Login", "Glassmorphism"],
+        previewAltura: 420,
+        html: '<div class="glogin-card"><div class="glogin-top"><span>LOGIN</span><div class="glogin-avatar">&#128100;</div></div><label class="glogin-field"><span class="glogin-icon">&#9993;</span><input type="email" placeholder="Email ID"></label><label class="glogin-field"><span class="glogin-icon">&#128274;</span><input type="password" placeholder="Password"></label><div class="glogin-row"><label class="glogin-remember"><input type="checkbox"> Remember me</label><a href="#" class="glogin-forgot">Forgot Password?</a></div><button class="glogin-btn">LOGIN</button></div>',
+        css: `
+body{ background:#05070a; display:flex; align-items:center; justify-content:center; }
+.glogin-card{
+  width: 300px;
+  padding: 34px 26px 28px;
+  border-radius: 46px 14px 30px 30px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 40px rgba(0,0,0,.5);
+  font-family: Arial, sans-serif;
+  color: rgba(255,255,255,.9);
+}
+.glogin-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom: 26px;
+}
+.glogin-top span{ font-weight:900; letter-spacing:1px; font-size:15px; color:#fff; }
+.glogin-avatar{
+  width:34px; height:34px;
+  border-radius:50%;
+  background: rgba(255,255,255,.12);
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px;
+}
+.glogin-field{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom: 1px solid rgba(255,255,255,.22);
+  padding: 10px 2px;
+  margin-bottom: 22px;
+}
+.glogin-icon{ font-size:14px; opacity:.8; }
+.glogin-field input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:#fff;
+  font-size:14px;
+}
+.glogin-field input::placeholder{ color: rgba(255,255,255,.5); }
+.glogin-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:12px;
+  color: rgba(255,255,255,.7);
+  margin-bottom: 22px;
+}
+.glogin-remember{ display:flex; align-items:center; gap:6px; }
+.glogin-forgot{ color: rgba(255,255,255,.7); text-decoration:none; }
+.glogin-btn{
+  width:100%;
+  padding: 14px;
+  border:none;
+  border-radius: 30px 10px 20px 20px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  color:#fff;
+  font-weight:900;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition: background .2s ease;
+}
+.glogin-btn:hover{ background: rgba(255,255,255,.22); }`,
+        js: ''
+      },
+      {
+        titulo: "Login neon (blob de vidro)",
+        fonte: "Recriado por Leandro, inspirado em posts de UI",
+        tags: ["CSS", "JavaScript", "Neon"],
+        previewAltura: 460,
+        html: '<div class="neonc-circle"><h3>Login</h3><input class="neonc-input" placeholder="Username"><div class="neonc-pass"><input class="neonc-input" type="password" placeholder="Password"><span class="neonc-show">Show</span></div><button class="neonc-btn">Sign in</button><div class="neonc-links"><a href="#">Forgot Password?</a><a href="#">Signup</a></div></div>',
+        css: `
+body{ background:#04070f; display:flex; align-items:center; justify-content:center; }
+@keyframes blobMorph{
+  0%,100%{ border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%; }
+  25%{ border-radius: 58% 42% 35% 65% / 55% 62% 38% 45%; }
+  50%{ border-radius: 45% 55% 60% 40% / 60% 35% 65% 40%; }
+  75%{ border-radius: 65% 35% 47% 53% / 40% 60% 40% 60%; }
+}
+.neonc-circle{
+  width: 280px;
+  padding: 46px 34px;
+  background: #0b1730;
+  border: 2px solid #39ff6a;
+  box-shadow: 0 0 30px 6px rgba(57,255,106,.5), inset 0 0 25px rgba(57,255,106,.12);
+  animation: blobMorph 7s ease-in-out infinite;
+  text-align:center;
+  font-family: Arial, sans-serif;
+  color:#eafff0;
+  box-sizing: border-box;
+}
+.neonc-circle h3{ margin:0 0 20px; font-size:22px; }
+.neonc-input{
+  width:100%;
+  padding:10px 12px;
+  margin-bottom:14px;
+  border-radius:10px;
+  border:1px solid rgba(57,255,106,.5);
+  background: rgba(255,255,255,.04);
+  color:#eafff0;
+  outline:none;
+  box-sizing:border-box;
+  font-size:13px;
+}
+.neonc-pass{ position:relative; }
+.neonc-show{
+  position:absolute;
+  right:12px; top:9px;
+  font-size:11px;
+  color: rgba(234,255,240,.65);
+  cursor:pointer;
+}
+.neonc-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:999px;
+  background: linear-gradient(90deg, #ff5f6d, #ffc371);
+  color:#1a0f00;
+  font-weight:900;
+  cursor:pointer;
+  margin: 6px 0 14px;
+}
+.neonc-links{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+}
+.neonc-links a{ color: rgba(234,255,240,.65); text-decoration:none; }`,
+        js: `
+var pass = document.querySelector(".neonc-pass input");
+var toggle = document.querySelector(".neonc-show");
+toggle.addEventListener("click", function(){
+  if (pass.type === "password"){
+    pass.type = "text";
+    toggle.textContent = "Hide";
+  } else {
+    pass.type = "password";
+    toggle.textContent = "Show";
+  }
+});`
+      },
+      {
+        titulo: "Login com cenário (entardecer)",
+        fonte: "Recriado por Leandro, inspirado em posts de UI",
+        tags: ["CSS", "Login", "Cenário"],
+        previewAltura: 400,
+        html: '<div class="land-scene"><div class="land-hill land-hill1"></div><div class="land-hill land-hill2"></div><div class="land-tree land-tree1"></div><div class="land-tree land-tree2"></div><div class="land-tree land-tree3"></div><div class="land-card"><h3>Login</h3><label class="land-field"><span>&#128100;</span><input placeholder="Username"></label><label class="land-field"><span>&#128274;</span><input type="password" placeholder="Password"></label><button class="land-btn">Login</button><div class="land-social"><span>G</span><span>f</span></div></div></div>',
+        css: `
+body{
+  background: linear-gradient(180deg,#2b1055 0%, #7b2ff7 30%, #f96d80 60%, #f9d976 100%);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  position:relative;
+}
+.land-scene{ position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+.land-hill{ position:absolute; bottom:0; left:0; width:100%; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+.land-hill1{ height:90px; background: rgba(20,10,40,.55); transform: scaleX(1.4); }
+.land-hill2{ height:60px; background: rgba(10,5,25,.75); transform: scaleX(1.6) translateY(10px); }
+.land-tree{ position:absolute; bottom:60px; width:0; height:0; border-left:14px solid transparent; border-right:14px solid transparent; border-bottom:50px solid rgba(10,5,20,.85); }
+.land-tree1{ left:10%; transform: scale(1.2); }
+.land-tree2{ left:78%; transform: scale(.9); }
+.land-tree3{ left:88%; bottom:55px; transform: scale(.6); }
+.land-card{
+  position:relative;
+  z-index:5;
+  width:250px;
+  padding:26px 22px;
+  border-radius:20px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.35);
+  backdrop-filter: blur(10px);
+  text-align:center;
+  color:#fff;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+.land-card h3{ margin:0 0 16px; }
+.land-field{
+  display:flex; align-items:center; gap:8px;
+  background: rgba(255,255,255,.15);
+  border-radius:10px;
+  padding:9px 12px;
+  margin-bottom:12px;
+}
+.land-field input{ flex:1; background:transparent; border:none; outline:none; color:#fff; font-size:13px; }
+.land-field input::placeholder{ color: rgba(255,255,255,.7); }
+.land-btn{
+  width:100%;
+  padding:11px;
+  border:none;
+  border-radius:10px;
+  background:#fff;
+  color:#333;
+  font-weight:900;
+  cursor:pointer;
+  margin-bottom:12px;
+}
+.land-social{ display:flex; gap:10px; justify-content:center; }
+.land-social span{
+  width:30px; height:30px;
+  border-radius:50%;
+  background: rgba(255,255,255,.2);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:13px;
+  cursor:pointer;
+}`,
+        js: ''
+      },
+      {
+        titulo: "Coração de partículas neon",
+        fonte: "Recriado por Leandro, inspirado em posts de UI",
+        tags: ["JavaScript", "Canvas", "Partículas"],
+        previewAltura: 340,
+        html: '<canvas id="heartCanvas" width="500" height="300"></canvas>',
+        css: `
+body{ background:#0a0612; display:flex; align-items:center; justify-content:center; }
+#heartCanvas{ background:#0a0612; border-radius:14px; max-width:100%; height:auto; }`,
+        js: `
+var canvas = document.getElementById("heartCanvas");
+var ctx = canvas.getContext("2d");
+var W = canvas.width, H = canvas.height;
+
+var estrelas = [];
+for (var i = 0; i < 90; i++){
+  estrelas.push({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    r: Math.random() * 1.4 + 0.3,
+    fase: Math.random() * Math.PI * 2
+  });
+}
+
+function pontoCoracao(t){
+  var x = 16 * Math.pow(Math.sin(t), 3);
+  var y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+  var escala = 9;
+  return {
+    x: W / 2 + x * escala,
+    y: H / 2 - y * escala + 10
+  };
+}
+
+var t = 0;
+var velocidade = 0.045;
+var particulas = [];
+
+function loop(time){
+  ctx.fillStyle = "rgba(10,6,18,0.18)";
+  ctx.fillRect(0, 0, W, H);
+
+  for (var i = 0; i < estrelas.length; i++){
+    var e = estrelas[i];
+    var brilho = 0.3 + 0.5 * Math.abs(Math.sin(time * 0.001 + e.fase));
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(255,255,255," + brilho + ")";
+    ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  t += velocidade;
+  if (t > Math.PI * 2){ t = 0; }
+
+  var p = pontoCoracao(t);
+
+  particulas.push({
+    x: p.x + (Math.random() - 0.5) * 6,
+    y: p.y + (Math.random() - 0.5) * 6,
+    vx: (Math.random() - 0.5) * 0.6,
+    vy: (Math.random() - 0.5) * 0.6,
+    vida: 32
+  });
+
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+
+  for (var i = particulas.length - 1; i >= 0; i--){
+    var part = particulas[i];
+    part.x += part.vx;
+    part.y += part.vy;
+    part.vida -= 1;
+    if (part.vida <= 0){ particulas.splice(i, 1); continue; }
+    var alpha = part.vida / 32;
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(200,110,255," + alpha + ")";
+    ctx.arc(part.x, part.y, 1.6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.shadowBlur = 18;
+  ctx.shadowColor = "rgba(190,90,255,0.9)";
+  ctx.beginPath();
+  ctx.fillStyle = "#e6c8ff";
+  ctx.arc(p.x, p.y, 3.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.restore();
+
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);`
+      },
+      {
+        titulo: "Órbitas com rastro neon",
+        fonte: "Recriado por Leandro, inspirado em posts de UI",
+        tags: ["JavaScript", "Canvas", "Animação"],
+        previewAltura: 300,
+        html: '<canvas id="orbitCanvas" width="400" height="300"></canvas>',
+        css: `
+body{ background:#07060d; display:flex; align-items:center; justify-content:center; }
+#orbitCanvas{ background:#07060d; border-radius:14px; max-width:100%; height:auto; }`,
+        js: `
+var canvas = document.getElementById("orbitCanvas");
+var ctx = canvas.getContext("2d");
+var W = canvas.width, H = canvas.height;
+var cx = W / 2, cy = H / 2;
+var raio = Math.min(W, H) * 0.32;
+
+var bracos = [
+  { cor: "56,189,248", fase: 0 },
+  { cor: "192,132,252", fase: Math.PI / 2 },
+  { cor: "244,63,94", fase: Math.PI },
+  { cor: "52,211,153", fase: Math.PI * 1.5 }
+];
+
+var t = 0;
+
+function loop(){
+  ctx.fillStyle = "rgba(7,6,13,0.16)";
+  ctx.fillRect(0, 0, W, H);
+
+  t += 0.03;
+
+  for (var i = 0; i < bracos.length; i++){
+    var b = bracos[i];
+    var ang = b.fase + t;
+    var x = cx + Math.cos(ang) * raio;
+    var y = cy + Math.sin(ang) * raio;
+
+    ctx.save();
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = "rgba(" + b.cor + ",0.9)";
+    ctx.beginPath();
+    ctx.fillStyle = "rgb(" + b.cor + ")";
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);`
+      },
+      {
+        titulo: "Login / Cadastro com validação",
+        fonte: "Recriado por Leandro, inspirado em posts de UI",
+        tags: ["HTML", "JavaScript", "Formulário"],
+        previewAltura: 480,
+        html: '<div class="auth-card"><div class="auth-tabs"><button class="auth-tab active" data-alvo="loginForm">Entrar</button><button class="auth-tab" data-alvo="signupForm">Criar conta</button></div><form class="auth-form" id="loginForm" novalidate><input type="email" placeholder="Email" required><input type="password" placeholder="Senha" required minlength="4"><button type="submit" class="auth-btn">Entrar</button></form><form class="auth-form" id="signupForm" novalidate hidden><input type="text" placeholder="Nome" required><input type="email" placeholder="Email" required><input type="password" placeholder="Senha (min. 4)" required minlength="4"><button type="submit" class="auth-btn">Criar conta</button></form><p class="auth-msg" id="authMsg"></p></div>',
+        css: `
+body{ background:#e6e7ee; display:flex; align-items:center; justify-content:center; }
+.auth-card{
+  width: 280px;
+  padding: 26px 24px;
+  border-radius: 22px;
+  background: #e6e7ee;
+  box-shadow: 9px 9px 18px #b8b9c4, -9px -9px 18px #ffffff;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+.auth-tabs{ display:flex; gap:8px; margin-bottom: 18px; }
+.auth-tab{
+  flex:1;
+  padding: 9px 0;
+  border: none;
+  border-radius: 10px;
+  background: #e6e7ee;
+  box-shadow: 4px 4px 8px #b8b9c4, -4px -4px 8px #ffffff;
+  color: #777;
+  font-weight: 800;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.auth-tab.active{
+  color: #333;
+  box-shadow: inset 3px 3px 6px #b8b9c4, inset -3px -3px 6px #ffffff;
+}
+.auth-form{ display:flex; flex-direction:column; gap:12px; }
+.auth-form[hidden]{ display:none; }
+.auth-form input{
+  border: none;
+  outline: none;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: #e6e7ee;
+  box-shadow: inset 4px 4px 8px #b8b9c4, inset -4px -4px 8px #ffffff;
+  color: #333;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+.auth-form input:invalid.tocado{
+  box-shadow: inset 4px 4px 8px #b8b9c4, inset -4px -4px 8px #ffffff, 0 0 0 2px #ff5f56;
+  animation: authShake .3s ease;
+}
+@keyframes authShake{
+  0%,100%{ transform: translateX(0); }
+  25%{ transform: translateX(-4px); }
+  75%{ transform: translateX(4px); }
+}
+.auth-btn{
+  margin-top: 4px;
+  padding: 11px;
+  border: none;
+  border-radius: 12px;
+  background: #00cc66;
+  color: #07140c;
+  font-weight: 900;
+  cursor: pointer;
+}
+.auth-msg{
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #00994d;
+  min-height: 16px;
+}`,
+        js: `
+var tabs = document.querySelectorAll(".auth-tab");
+var loginForm = document.getElementById("loginForm");
+var signupForm = document.getElementById("signupForm");
+var msg = document.getElementById("authMsg");
+
+tabs.forEach(function(tab){
+  tab.addEventListener("click", function(){
+    tabs.forEach(function(t){ t.classList.remove("active"); });
+    tab.classList.add("active");
+    var alvo = tab.dataset.alvo;
+    loginForm.hidden = alvo !== "loginForm";
+    signupForm.hidden = alvo !== "signupForm";
+    msg.textContent = "";
+  });
+});
+
+function validar(form){
+  var campos = form.querySelectorAll("input");
+  var valido = true;
+  campos.forEach(function(campo){
+    campo.classList.add("tocado");
+    if (!campo.checkValidity()) valido = false;
+  });
+  return valido;
+}
+
+[loginForm, signupForm].forEach(function(form){
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    if (validar(form)){
+      msg.textContent = "Tudo certo! Formulario valido.";
+    } else {
+      msg.textContent = "Preenche os campos certinho antes de continuar.";
+    }
+  });
+});`
+      },
+      {
+        titulo: "Login neumórfico circular",
+        fonte: "Recriado por Leandro, inspirado em posts de UI",
+        tags: ["CSS", "Login", "Neumorfismo"],
+        previewAltura: 420,
+        html: '<div class="neu-circle"><h3>Login</h3><input class="neu-c-input" placeholder="Username"><input class="neu-c-input" type="password" placeholder="Password"><button class="neu-c-btn">Sign In</button></div>',
+        css: `
+body{ background:#e6e7ee; display:flex; align-items:center; justify-content:center; }
+.neu-circle{
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: #e6e7ee;
+  box-shadow: 18px 18px 35px #b8b9c4, -18px -18px 35px #ffffff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap: 10px;
+  padding: 30px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+.neu-circle h3{ margin: 0 0 4px; color:#444; }
+.neu-c-input{
+  width: 78%;
+  border: none;
+  outline: none;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: #e6e7ee;
+  box-shadow: inset 4px 4px 8px #b8b9c4, inset -4px -4px 8px #ffffff;
+  color: #333;
+  font-size: 12.5px;
+  box-sizing: border-box;
+}
+.neu-c-btn{
+  width: 78%;
+  padding: 9px;
+  border: none;
+  border-radius: 10px;
+  background: #e6e7ee;
+  box-shadow: 5px 5px 10px #b8b9c4, -5px -5px 10px #ffffff;
+  color: #444;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.neu-c-btn:active{
+  box-shadow: inset 4px 4px 8px #b8b9c4, inset -4px -4px 8px #ffffff;
+}`,
+        js: ''
       }
     ];
 
