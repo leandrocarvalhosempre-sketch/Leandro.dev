@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerador de Gradientes CSS</title>
+<title>Misturador de Cores CSS</title>
 <style>
   :root {
     --gold: #d4af37;
@@ -11,7 +11,7 @@
     --bg: #0a0a0f;
   }
 
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   body {
     margin: 0;
@@ -47,16 +47,7 @@
 
   .wrap {
     width: 100%;
-    max-width: 760px;
-  }
-
-  .preview {
-    width: 100%;
-    height: 220px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 24px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    max-width: 560px;
   }
 
   .card {
@@ -68,246 +59,139 @@
     margin-bottom: 20px;
   }
 
-  .mode-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 22px;
-    flex-wrap: wrap;
-  }
-
-  .toggle {
-    display: flex;
-    border: 1px solid rgba(212,175,55,0.4);
-    border-radius: 10px;
+  /* Quadrado de seleção (saturação x brilho) */
+  .sv-square {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.6 / 1;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor: crosshair;
+    touch-action: none;
+    background-color: hsl(20, 100%, 50%);
+    background-image:
+      linear-gradient(to top, #000, rgba(0,0,0,0)),
+      linear-gradient(to right, #fff, rgba(255,255,255,0));
+    margin-bottom: 16px;
     overflow: hidden;
   }
 
-  .toggle button {
-    background: transparent;
-    border: none;
-    color: #bbb;
-    padding: 9px 18px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-
-  .toggle button.active {
-    background: linear-gradient(90deg, var(--gold), #b8933a);
-    color: #0a0a0f;
-  }
-
-  .angle-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    padding: 6px 12px;
-  }
-
-  .angle-box input[type="number"] {
-    width: 55px;
-    background: transparent;
-    border: none;
-    color: var(--green);
-    font-size: 0.9rem;
-    font-family: 'Courier New', monospace;
-  }
-
-  .angle-box span { color: #888; font-size: 0.8rem; }
-
-  /* Slider de paradas */
-  .stops-label {
-    font-size: 0.8rem;
-    color: #999;
-    margin-bottom: 10px;
-  }
-
-  .track-container {
-    position: relative;
-    height: 40px;
-    margin-bottom: 14px;
-    padding: 0 12px;
-  }
-
-  .track {
+  .sv-handle {
     position: absolute;
-    top: 50%;
-    left: 12px;
-    right: 12px;
-    height: 14px;
-    transform: translateY(-50%);
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.15);
-    cursor: copy;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.5);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
   }
 
-  .stop-handle {
+  /* Slider de matiz */
+  .hue-slider {
+    position: relative;
+    width: 100%;
+    height: 18px;
+    border-radius: 9px;
+    background: linear-gradient(to right,
+      #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+    touch-action: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .hue-handle {
     position: absolute;
     top: 50%;
     width: 22px;
     height: 22px;
     border-radius: 50%;
     border: 3px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.5);
     transform: translate(-50%, -50%);
-    cursor: grab;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    pointer-events: none;
+    background: hsl(20, 100%, 50%);
   }
 
-  .stop-handle.selected {
-    border-color: var(--green);
-  }
-
-  .stop-handle:active { cursor: grabbing; }
-
-  .add-hint {
-    font-size: 0.75rem;
-    color: #666;
-    margin-bottom: 20px;
-  }
-
-  .stop-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .stop-row {
+  .current-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.08);
+    gap: 14px;
+  }
+
+  .current-swatch {
+    width: 56px;
+    height: 56px;
     border-radius: 10px;
-    padding: 8px 10px;
-  }
-
-  .stop-row.selected {
-    border-color: var(--green);
-  }
-
-  .swatch-input {
-    width: 34px;
-    height: 34px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    padding: 0;
-    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
     flex-shrink: 0;
+    background: hsl(20, 100%, 50%);
   }
 
-  .stop-row input[type="text"] {
-    background: transparent;
-    border: none;
-    color: #ddd;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    width: 90px;
-  }
-
-  .stop-row .pos {
-    background: transparent;
-    border: none;
-    color: var(--gold);
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    width: 45px;
-    text-align: right;
-  }
-
-  .stop-row .pos-suffix { color: #888; font-size: 0.8rem; }
-
-  .stop-row .remove {
-    margin-left: auto;
-    background: transparent;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    font-size: 1.1rem;
-    padding: 4px 8px;
-  }
-
-  .stop-row .remove:hover { color: #ff5555; }
-
-  .add-stop-btn {
-    background: transparent;
-    border: 1px dashed rgba(212,175,55,0.5);
-    color: var(--gold);
-    padding: 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    margin-top: 12px;
-    width: 100%;
-  }
-
-  .add-stop-btn:hover {
-    background: rgba(212,175,55,0.08);
-  }
-
-  .code-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .code-block {
+  .formats {
     flex: 1;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .format-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    color: #9adfae;
-    white-space: pre-wrap;
-    word-break: break-all;
+    font-size: 0.82rem;
+  }
+
+  .format-row .label {
+    color: var(--green);
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.68rem;
+    min-width: 30px;
+  }
+
+  .format-row .val {
+    color: #ddd;
+    flex: 1;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 
   .copy-btn {
     background: rgba(212,175,55,0.15);
     color: var(--gold);
     border: 1px solid rgba(212,175,55,0.4);
-    padding: 10px 16px;
-    font-size: 0.8rem;
-    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.68rem;
+    border-radius: 6px;
     cursor: pointer;
-    white-space: nowrap;
     flex-shrink: 0;
   }
 
-  .copy-btn:hover {
-    background: rgba(212,175,55,0.25);
-  }
-
+  .copy-btn:hover { background: rgba(212,175,55,0.25); }
   .copy-btn.copied {
     background: rgba(0,255,136,0.2);
     color: var(--green);
     border-color: var(--green);
   }
 
-  .presets {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 8px;
-  }
-
-  .preset {
-    width: 70px;
-    height: 44px;
-    border-radius: 8px;
+  .add-mix-btn {
+    background: linear-gradient(90deg, var(--gold), #b8933a);
+    color: #0a0a0f;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.82rem;
     cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: transform 0.15s ease;
+    margin-top: 16px;
+    width: 100%;
   }
 
-  .preset:hover { transform: scale(1.08); }
+  .add-mix-btn:hover { filter: brightness(1.1); }
 
   .section-title {
     font-size: 0.8rem;
@@ -316,261 +200,295 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
+
+  .mix-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    min-height: 40px;
+  }
+
+  .mix-chip {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    position: relative;
+    cursor: pointer;
+  }
+
+  .mix-chip .x {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 16px;
+    height: 16px;
+    background: #222;
+    border: 1px solid #666;
+    border-radius: 50%;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+  }
+
+  .mix-empty {
+    color: #666;
+    font-size: 0.82rem;
+    padding: 10px 0;
+  }
+
+  .mix-result {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
 </style>
 </head>
 <body>
 
 <div class="wrap">
-  <h1>Gerador de Gradientes CSS</h1>
-  <p class="subtitle">Arraste as paradas, ajuste as cores e copie o código pronto</p>
-
-  <div class="preview" id="preview"></div>
+  <h1>Misturador de Cores</h1>
+  <p class="subtitle">Escolha uma cor, adicione à mistura e veja o código resultante</p>
 
   <div class="card">
-    <div class="mode-row">
-      <div class="toggle">
-        <button id="btnLinear" class="active">Linear</button>
-        <button id="btnRadial">Radial</button>
-      </div>
-      <div class="angle-box" id="angleBox">
-        <span>Ângulo</span>
-        <input type="number" id="angleInput" value="90" min="0" max="360">
-        <span>°</span>
-      </div>
+    <div class="sv-square" id="svSquare">
+      <div class="sv-handle" id="svHandle"></div>
     </div>
 
-    <div class="stops-label">Paradas de cor</div>
-    <div class="track-container">
-      <div class="track" id="track"></div>
+    <div class="hue-slider" id="hueSlider">
+      <div class="hue-handle" id="hueHandle"></div>
     </div>
-    <div class="add-hint">Clique na barra para adicionar uma parada</div>
 
-    <div class="stop-list" id="stopList"></div>
+    <div class="current-row">
+      <div class="current-swatch" id="currentSwatch"></div>
+      <div class="formats" id="currentFormats"></div>
+    </div>
 
-    <button class="add-stop-btn" id="addStopBtn">+ Adicionar parada</button>
+    <button class="add-mix-btn" id="addMixBtn">+ Adicionar à mistura</button>
   </div>
 
   <div class="card">
-    <div class="section-title">Presets rápidos</div>
-    <div class="presets" id="presets"></div>
-  </div>
+    <div class="section-title">Cores na mistura (clique para remover)</div>
+    <div class="mix-list" id="mixList">
+      <span class="mix-empty">Nenhuma cor adicionada ainda</span>
+    </div>
 
-  <div class="card">
-    <div class="section-title">Código CSS</div>
-    <div class="code-row">
-      <div class="code-block" id="cssCode"></div>
-      <button class="copy-btn" id="copyBtn">Copiar</button>
+    <div class="mix-result" id="mixResult" style="display:none;">
+      <div class="current-swatch" id="mixSwatch"></div>
+      <div class="formats" id="mixFormats"></div>
     </div>
   </div>
 </div>
 
 <script>
-  const track = document.getElementById('track');
-  const preview = document.getElementById('preview');
-  const stopList = document.getElementById('stopList');
-  const cssCode = document.getElementById('cssCode');
-  const angleInput = document.getElementById('angleInput');
-  const angleBox = document.getElementById('angleBox');
-  const btnLinear = document.getElementById('btnLinear');
-  const btnRadial = document.getElementById('btnRadial');
+  const svSquare = document.getElementById('svSquare');
+  const svHandle = document.getElementById('svHandle');
+  const hueSlider = document.getElementById('hueSlider');
+  const hueHandle = document.getElementById('hueHandle');
+  const currentSwatch = document.getElementById('currentSwatch');
+  const currentFormats = document.getElementById('currentFormats');
+  const mixList = document.getElementById('mixList');
+  const mixResult = document.getElementById('mixResult');
+  const mixSwatch = document.getElementById('mixSwatch');
+  const mixFormats = document.getElementById('mixFormats');
 
-  let mode = 'linear';
-  let angle = 90;
-  let selectedId = null;
-  let idCounter = 0;
+  let hue = 20;
+  let sat = 100; // 0-100 (eixo X do quadrado)
+  let val = 100; // 0-100 (eixo Y do quadrado, brilho)
+  let mixColors = [];
 
-  let stops = [
-    { id: idCounter++, hex: '#d4af37', pos: 0 },
-    { id: idCounter++, hex: '#00ff88', pos: 50 },
-    { id: idCounter++, hex: '#0a0a0f', pos: 100 }
-  ];
-
-  function sortedStops() {
-    return [...stops].sort((a, b) => a.pos - b.pos);
+  function hsvToRgb(h, s, v) {
+    s /= 100; v /= 100;
+    const c = v * s;
+    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = v - c;
+    let r, g, b;
+    if (h < 60) [r, g, b] = [c, x, 0];
+    else if (h < 120) [r, g, b] = [x, c, 0];
+    else if (h < 180) [r, g, b] = [0, c, x];
+    else if (h < 240) [r, g, b] = [0, x, c];
+    else if (h < 300) [r, g, b] = [x, 0, c];
+    else [r, g, b] = [c, 0, x];
+    return {
+      r: Math.round((r + m) * 255),
+      g: Math.round((g + m) * 255),
+      b: Math.round((b + m) * 255)
+    };
   }
 
-  function buildGradientCss() {
-    const stopsCss = sortedStops().map(s => `${s.hex} ${s.pos}%`).join(', ');
-    if (mode === 'linear') {
-      return `linear-gradient(${angle}deg, ${stopsCss})`;
+  function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+  }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) { h = s = 0; }
+    else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
     }
-    return `radial-gradient(circle, ${stopsCss})`;
+    return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
   }
 
-  function render() {
-    const gradient = buildGradientCss();
-    preview.style.background = gradient;
-    track.style.background = gradient.replace('circle, ', '').startsWith('linear')
-      ? `linear-gradient(90deg, ${sortedStops().map(s => `${s.hex} ${s.pos}%`).join(', ')})`
-      : `linear-gradient(90deg, ${sortedStops().map(s => `${s.hex} ${s.pos}%`).join(', ')})`;
-
-    cssCode.textContent = `background: ${gradient};`;
-
-    // Render handles
-    track.querySelectorAll('.stop-handle').forEach(el => el.remove());
-    stops.forEach(s => {
-      const handle = document.createElement('div');
-      handle.className = 'stop-handle' + (s.id === selectedId ? ' selected' : '');
-      handle.style.left = s.pos + '%';
-      handle.style.background = s.hex;
-      handle.dataset.id = s.id;
-      handle.addEventListener('pointerdown', onHandleDown);
-      track.appendChild(handle);
-    });
-
-    // Render stop list
-    stopList.innerHTML = '';
-    sortedStops().forEach(s => {
-      const row = document.createElement('div');
-      row.className = 'stop-row' + (s.id === selectedId ? ' selected' : '');
-      row.innerHTML = `
-        <input type="color" class="swatch-input" value="${s.hex}">
-        <input type="text" class="hex-text" value="${s.hex}">
-        <input type="number" class="pos" value="${s.pos}" min="0" max="100">
-        <span class="pos-suffix">%</span>
-        <button class="remove">✕</button>
-      `;
-      row.addEventListener('click', () => { selectedId = s.id; render(); });
-
-      const colorInput = row.querySelector('.swatch-input');
-      colorInput.addEventListener('input', (e) => {
-        s.hex = e.target.value;
-        render();
-      });
-
-      const hexText = row.querySelector('.hex-text');
-      hexText.addEventListener('change', (e) => {
-        let val = e.target.value.trim();
-        if (!val.startsWith('#')) val = '#' + val;
-        if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
-          s.hex = val;
-          render();
-        }
-      });
-      hexText.addEventListener('click', (e) => e.stopPropagation());
-
-      const posInput = row.querySelector('.pos');
-      posInput.addEventListener('change', (e) => {
-        let v = parseFloat(e.target.value);
-        if (isNaN(v)) v = 0;
-        v = Math.max(0, Math.min(100, v));
-        s.pos = v;
-        render();
-      });
-      posInput.addEventListener('click', (e) => e.stopPropagation());
-
-      const removeBtn = row.querySelector('.remove');
-      removeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (stops.length <= 2) return;
-        stops = stops.filter(st => st.id !== s.id);
-        render();
-      });
-
-      stopList.appendChild(row);
-    });
-  }
-
-  function onHandleDown(e) {
-    const id = parseInt(e.target.dataset.id);
-    selectedId = id;
-    e.target.setPointerCapture(e.pointerId);
-
-    function onMove(ev) {
-      const rect = track.getBoundingClientRect();
-      let pct = ((ev.clientX - rect.left) / rect.width) * 100;
-      pct = Math.max(0, Math.min(100, pct));
-      const stop = stops.find(s => s.id === id);
-      stop.pos = Math.round(pct);
-      render();
-    }
-    function onUp() {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-    }
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-  }
-
-  track.addEventListener('click', (e) => {
-    if (e.target !== track) return;
-    const rect = track.getBoundingClientRect();
-    let pct = ((e.clientX - rect.left) / rect.width) * 100;
-    pct = Math.round(Math.max(0, Math.min(100, pct)));
-    const newStop = { id: idCounter++, hex: '#ffffff', pos: pct };
-    stops.push(newStop);
-    selectedId = newStop.id;
-    render();
-  });
-
-  document.getElementById('addStopBtn').addEventListener('click', () => {
-    const newStop = { id: idCounter++, hex: '#ffffff', pos: 50 };
-    stops.push(newStop);
-    selectedId = newStop.id;
-    render();
-  });
-
-  btnLinear.addEventListener('click', () => {
-    mode = 'linear';
-    btnLinear.classList.add('active');
-    btnRadial.classList.remove('active');
-    angleBox.style.display = 'flex';
-    render();
-  });
-
-  btnRadial.addEventListener('click', () => {
-    mode = 'radial';
-    btnRadial.classList.add('active');
-    btnLinear.classList.remove('active');
-    angleBox.style.display = 'none';
-    render();
-  });
-
-  angleInput.addEventListener('input', (e) => {
-    angle = parseInt(e.target.value) || 0;
-    render();
-  });
-
-  document.getElementById('copyBtn').addEventListener('click', () => {
-    navigator.clipboard.writeText(cssCode.textContent).then(() => {
-      const btn = document.getElementById('copyBtn');
+  function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
       const original = btn.textContent;
       btn.textContent = 'Copiado!';
       btn.classList.add('copied');
       setTimeout(() => {
         btn.textContent = original;
         btn.classList.remove('copied');
-      }, 1500);
+      }, 1200);
     });
+  }
+
+  function buildFormatsHtml(hex, rgbStr, hslStr) {
+    return `
+      <div class="format-row">
+        <span class="label">HEX</span>
+        <span class="val">${hex}</span>
+        <button class="copy-btn" data-copy="${hex}">Copiar</button>
+      </div>
+      <div class="format-row">
+        <span class="label">RGB</span>
+        <span class="val">${rgbStr}</span>
+        <button class="copy-btn" data-copy="${rgbStr}">Copiar</button>
+      </div>
+      <div class="format-row">
+        <span class="label">HSL</span>
+        <span class="val">${hslStr}</span>
+        <button class="copy-btn" data-copy="${hslStr}">Copiar</button>
+      </div>
+    `;
+  }
+
+  function attachCopyHandlers(container) {
+    container.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => copyText(btn.dataset.copy, btn));
+    });
+  }
+
+  function updateCurrent() {
+    const { r, g, b } = hsvToRgb(hue, sat, val);
+    const hex = rgbToHex(r, g, b);
+    const rgbStr = `rgb(${r}, ${g}, ${b})`;
+    const hsl = rgbToHsl(r, g, b);
+    const hslStr = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+
+    currentSwatch.style.background = hex;
+    currentFormats.innerHTML = buildFormatsHtml(hex, rgbStr, hslStr);
+    attachCopyHandlers(currentFormats);
+
+    svSquare.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+    hueHandle.style.background = `hsl(${hue}, 100%, 50%)`;
+  }
+
+  function updateHandlePositions() {
+    svHandle.style.left = sat + '%';
+    svHandle.style.top = (100 - val) + '%';
+    hueHandle.style.left = (hue / 360 * 100) + '%';
+  }
+
+  function setFromSquare(clientX, clientY) {
+    const rect = svSquare.getBoundingClientRect();
+    let x = (clientX - rect.left) / rect.width;
+    let y = (clientY - rect.top) / rect.height;
+    x = Math.max(0, Math.min(1, x));
+    y = Math.max(0, Math.min(1, y));
+    sat = Math.round(x * 100);
+    val = Math.round((1 - y) * 100);
+    updateHandlePositions();
+    updateCurrent();
+  }
+
+  function setFromHueSlider(clientX) {
+    const rect = hueSlider.getBoundingClientRect();
+    let x = (clientX - rect.left) / rect.width;
+    x = Math.max(0, Math.min(1, x));
+    hue = Math.round(x * 360);
+    updateHandlePositions();
+    updateCurrent();
+  }
+
+  function dragify(el, onMove) {
+    el.addEventListener('pointerdown', (e) => {
+      el.setPointerCapture(e.pointerId);
+      onMove(e.clientX, e.clientY);
+      function move(ev) { onMove(ev.clientX, ev.clientY); }
+      function up() {
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+      }
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+    });
+  }
+
+  dragify(svSquare, setFromSquare);
+  dragify(hueSlider, (x) => setFromHueSlider(x));
+
+  document.getElementById('addMixBtn').addEventListener('click', () => {
+    const { r, g, b } = hsvToRgb(hue, sat, val);
+    mixColors.push({ r, g, b });
+    renderMix();
   });
 
-  // Presets
-  const presetList = [
-    ['#d4af37', '#00ff88'],
-    ['#0a0a0f', '#d4af37'],
-    ['#00ff88', '#0a0a0f'],
-    ['#ff6b6b', '#4ecdc4'],
-    ['#667eea', '#764ba2'],
-    ['#f093fb', '#f5576c']
-  ];
+  function renderMix() {
+    mixList.innerHTML = '';
+    if (mixColors.length === 0) {
+      mixList.innerHTML = '<span class="mix-empty">Nenhuma cor adicionada ainda</span>';
+      mixResult.style.display = 'none';
+      return;
+    }
 
-  const presetsEl = document.getElementById('presets');
-  presetList.forEach(colors => {
-    const div = document.createElement('div');
-    div.className = 'preset';
-    div.style.background = `linear-gradient(90deg, ${colors[0]}, ${colors[1]})`;
-    div.addEventListener('click', () => {
-      stops = [
-        { id: idCounter++, hex: colors[0], pos: 0 },
-        { id: idCounter++, hex: colors[1], pos: 100 }
-      ];
-      selectedId = null;
-      render();
+    mixColors.forEach((c, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'mix-chip';
+      chip.style.background = rgbToHex(c.r, c.g, c.b);
+      chip.innerHTML = '<span class="x">✕</span>';
+      chip.addEventListener('click', () => {
+        mixColors.splice(i, 1);
+        renderMix();
+      });
+      mixList.appendChild(chip);
     });
-    presetsEl.appendChild(div);
-  });
 
-  render();
+    // Calcula a média das cores misturadas
+    const total = mixColors.reduce((acc, c) => {
+      acc.r += c.r; acc.g += c.g; acc.b += c.b;
+      return acc;
+    }, { r: 0, g: 0, b: 0 });
+
+    const n = mixColors.length;
+    const r = Math.round(total.r / n);
+    const g = Math.round(total.g / n);
+    const b = Math.round(total.b / n);
+    const hex = rgbToHex(r, g, b);
+    const rgbStr = `rgb(${r}, ${g}, ${b})`;
+    const hsl = rgbToHsl(r, g, b);
+    const hslStr = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+
+    mixSwatch.style.background = hex;
+    mixFormats.innerHTML = buildFormatsHtml(hex, rgbStr, hslStr);
+    attachCopyHandlers(mixFormats);
+    mixResult.style.display = 'flex';
+  }
+
+  updateHandlePositions();
+  updateCurrent();
 </script>
 
 </body>
